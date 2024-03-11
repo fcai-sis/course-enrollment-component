@@ -1,11 +1,11 @@
 import { Router } from "express";
 
-import exampleRoutes from "./features/example/example.routes";
+import enrollmentRoutes from "./features/example/enrollment.routes";
 
 const router: Router = Router();
 
 export default (): Router => {
-  exampleRoutes(router);
+  enrollmentRoutes(router);
 
   return router;
 };
