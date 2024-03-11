@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import enrollmentRoutes from "./features/example/enrollment.routes";
+import enrollmentRoutes from "./features/enrollment/enrollment.routes";
 
 const router: Router = Router();
 
