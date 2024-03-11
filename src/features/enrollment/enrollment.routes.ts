@@ -5,7 +5,7 @@ import getPassedCoursesMiddleware from "./logic/middlewares/getPassedCourses.mid
 import enrollCourseHandler from "./logic/handlers/enrollCourse.handler";
 import fetchEligibleCourses from "./logic/handlers/fetchEligibleCourses.handler";
 import createEnrollment from "./logic/handlers/createEnrollment.handler";
-import coursePassedHandler from "./logic/handlers/CoursePassed.handler";
+import coursePassedHandler from "./logic/handlers/passCourse.handler";
 
 export default (router: Router) => {
   router.post("/create", asyncHandler(createEnrollment));
