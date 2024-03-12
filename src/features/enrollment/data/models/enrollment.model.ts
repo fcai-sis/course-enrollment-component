@@ -29,7 +29,7 @@ export const courseEnrollmentSchema = new Schema({
           type: Number,
           default: 0,
         },
-        finalExamHall: {
+        examHall: {
           type: Schema.Types.ObjectId,
           ref: hallModelName,
           default: null,
