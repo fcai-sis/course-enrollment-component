@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { CourseEnrollmentModel } from "../../data/models/enrollment.model";
 import { CourseModel } from "@fcai-sis/shared-models";
+import { FetchEligibleCoursesContextType } from "../contexts/fetchEligibleCourses.context";
 
 /**
  * Fetch all courses that a student is eligible to enroll in
@@ -15,7 +16,7 @@ type HandlerRequest = Request<
 >;
 
 const handler = async (req: HandlerRequest, res: Response) => {
-  const { passedCourses } = req as any;
+  const { passedCourses } = req.context as FetchEligibleCoursesContextType;
   const studentId = req.params.studentId;
   // console.log(passedCourses);
 
@@ -38,19 +39,19 @@ const handler = async (req: HandlerRequest, res: Response) => {
   });
 
   // Using the passed courses array, if a prerequisite ID is not found in the passed courses array, remove the course from the available courses
-  const filteredAvailableCourses = availableCourses.filter((course) => {
-    if (course.prerequisites) {
-      return course.prerequisites.every((prerequisite) =>
-        passedCourses.includes(prerequisite)
-      );
-    }
-    return true;
-  });
+  // const filteredAvailableCourses = availableCourses.filter((course) => {
+  //   if (course.prerequisites) {
+  //     return course.prerequisites.every((prerequisite) =>
+  //       passedCourses.includes(prerequisite)
+  //     );
+  //   }
+  //   return true;
+  // });
 
   const response = {
     studentId,
     courses: enrolledCourses.map((enrollment) => enrollment.courses),
-    availableCourses: filteredAvailableCourses,
+    availableCourses: availableCourses,
   };
 
   return res.status(200).json(response);
