@@ -1,12 +1,23 @@
 import { Request, Response } from "express";
+import { CourseType } from "@fcai-sis/shared-models";
 
-type HandlerRequest = Request;
+import { EnrollmentType } from "../../data/models/enrollment.model";
+import { Document } from "mongoose";
+
+type HandlerRequest = Request<
+  {},
+  {},
+  {
+    enrollment: EnrollmentType & Document;
+    coursesToEnrollIn: (CourseType & Document)[];
+  }
+>;
 
 /**
  * Creates a new enrollment for a student in a course
  */
 const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
-  const { enrollment, coursesToEnrollIn } = req.context;
+  const { enrollment, coursesToEnrollIn } = req.body;
 
   // Get the student's passed courses
   const passedCourses = enrollment.courses.filter(
@@ -28,6 +39,9 @@ const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
       });
     }
   }
+
+  console.log('courses to enroll in', coursesToEnrollIn);
+
 
   // For each course to enroll in, check it's prerequisites in the `passedCourses` array
   for (const course of coursesToEnrollIn) {

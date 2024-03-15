@@ -17,25 +17,25 @@ const validateCreateEnrollmentRequestMiddleware = [
         throw new Error('Student not found');
       }
 
-      req.context.student = student;
+      req.body.student = student;
 
       return true;
     }),
 
   validator
-    .body('coursesToEnrollIn')
+    .body('courses')
     .exists()
     .withMessage('Courses to enroll in is required')
     .isArray()
     .withMessage('At least one course is required')
     .custom((_, { req }) => {
-      req.context.coursesToEnrollIn = [];
+      req.body.coursesToEnrollIn = [];
 
       return true;
     }),
 
   validator
-    .body('coursesToEnrollIn.*')
+    .body('courses.*')
     .isMongoId()
     .withMessage('Invalid course ID')
     .custom(async (value, { req }) => {
@@ -46,7 +46,7 @@ const validateCreateEnrollmentRequestMiddleware = [
         throw new Error('Course not found');
       }
 
-      req.context.coursesToEnrollIn.push(course);
+      req.body.coursesToEnrollIn.push(course);
 
       return true;
     }),

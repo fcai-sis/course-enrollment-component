@@ -1,7 +1,8 @@
-import { StudentModel } from '@fcai-sis/shared-models';
+import { StudentModel, StudentType } from '@fcai-sis/shared-models';
 import { Request, Response, NextFunction } from 'express';
+import { Document } from 'mongoose';
 
-type MiddlewareRequest = Request<{}, {}, { studentId: string }>;
+type MiddlewareRequest = Request<{}, {}, { studentId: string, student: StudentType & Document }>;
 
 const ensureStudentExistsMiddleware = async (req: MiddlewareRequest, res: Response, next: NextFunction) => {
   const { studentId } = req.body;
@@ -12,7 +13,7 @@ const ensureStudentExistsMiddleware = async (req: MiddlewareRequest, res: Respon
     return res.status(404).json({ message: 'Student not found' });
   }
 
-  req.context.student = student;
+  req.body.student = student;
 
   next();
 }
