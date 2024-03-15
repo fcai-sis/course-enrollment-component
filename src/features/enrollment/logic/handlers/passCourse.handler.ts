@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CourseEnrollmentModel } from "../../data/models/enrollment.model";
+import { EnrollmentModel } from "../../data/models/enrollment.model";
 import { CourseModel } from "@fcai-sis/shared-models";
 
 type HandlerRequest = Request<
@@ -27,8 +27,8 @@ const handler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
-  const enrollment = await CourseEnrollmentModel.findOne({
-    student: studentId,
+  const enrollment = await EnrollmentModel.findOne({
+    studentId: studentId,
     "courses.courseId": courseId,
   });
 
