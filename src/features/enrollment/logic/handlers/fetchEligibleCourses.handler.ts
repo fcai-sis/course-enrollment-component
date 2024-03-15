@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { EnrollmentModel } from "../../data/models/enrollment.model";
 import { CourseModel } from "@fcai-sis/shared-models";
+
+import { EnrollmentModel } from "../../data/models/enrollment.model";
 import { FetchEligibleCoursesContextType } from "../contexts/fetchEligibleCourses.context";
 
 /**
