@@ -15,7 +15,7 @@ type HandlerRequest = Request<
   {}
 >;
 
-const handler = async (req: HandlerRequest, res: Response) => {
+const fetchEligibleCourses = async (req: HandlerRequest, res: Response) => {
   const { passedCourses } = req.context as FetchEligibleCoursesContextType;
   const studentId = req.params.studentId;
 
@@ -60,5 +60,4 @@ const handler = async (req: HandlerRequest, res: Response) => {
   return res.status(200).json(response);
 };
 
-const fetchEligibleCourses = handler;
 export default fetchEligibleCourses;
