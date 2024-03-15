@@ -12,18 +12,14 @@ import validateCreateEnrollmentRequestMiddleware from "./logic/middlewares/valid
 export default (router: Router) => {
   router.post(
     "/create",
-
     validateCreateEnrollmentRequestMiddleware,
     ensureEnrollmentExistsMiddleware,
-
     asyncHandler(createEnrollmentHandler),
   );
 
   router.post(
     "/enroll/:studentId",
-
     getPassedCoursesMiddleware,
-
     asyncHandler(enrollCourseHandler)
   );
 
