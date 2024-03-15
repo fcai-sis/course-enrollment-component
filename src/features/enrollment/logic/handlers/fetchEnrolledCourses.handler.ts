@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CourseEnrollmentModel } from "../../data/models/enrollment.model";
+import { EnrollmentModel } from "../../data/models/enrollment.model";
 
 /**
  * Fetches all courses that a student is enrolled in
@@ -16,8 +16,8 @@ type HandlerRequest = Request<
 const handler = async (req: HandlerRequest, res: Response) => {
   const { studentId } = req.body;
 
-  const enrolledCourses = await CourseEnrollmentModel.find({
-    student: studentId,
+  const enrolledCourses = await EnrollmentModel.find({
+    studentId: studentId,
   }).populate("courses");
   if (!enrolledCourses || !enrolledCourses.length) {
     return res.status(404).json({ message: "No courses found" });
