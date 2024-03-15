@@ -6,13 +6,12 @@ import { EnrollmentModel } from "../../data/models/enrollment.model";
 
 // Middleware chain
 const middlewares = [
-  validator
-    .param("studentId")
-    .isString()
-    .withMessage("Invalid student ID"),
+  validator.param("studentId").isString().withMessage("Invalid student ID"),
 
   (req: Request, res: Response, next: NextFunction) => {
-    logger.debug(`Validating get passed courses req: ${JSON.stringify(req.body)}`);
+    logger.debug(
+      `Validating get passed courses req: ${JSON.stringify(req.body)}`
+    );
 
     // If any of the validations above failed, return an error response
     const errors = validator.validationResult(req);
@@ -41,6 +40,21 @@ const middlewares = [
 
     // Get the student's enrollment object if it exists
     const existingEnrollment = await EnrollmentModel.findOne({ studentId });
+    if (existingEnrollment) {
+      passedCourses.push(
+        ...existingEnrollment.courses.filter(
+          (course: any) => course.status === "passed"
+        )
+      );
+    }
+
+    // Add the passed courses to the request context
+    req.context = {
+      ...req.context,
+      passedCourses,
+    };
+
+    next();
   },
 ];
 
