@@ -1,18 +1,29 @@
 import { Router } from "express";
 
 import { asyncHandler } from "@fcai-sis/shared-utilities";
-import getPassedCoursesMiddleware from "./logic/middlewares/getPassedCourses.middleware";
-import enrollCourseHandler from "./logic/handlers/enrollCourse.handler";
-import fetchEligibleCourses from "./logic/handlers/fetchEligibleCourses.handler";
-import createEnrollment from "./logic/handlers/createEnrollment.handler";
 import coursePassedHandler from "./logic/handlers/passCourse.handler";
+import enrollCourseHandler from "./logic/handlers/enrollCourse.handler";
+import createEnrollmentHandler from "./logic/handlers/createEnrollment.handler";
+import fetchEligibleCourses from "./logic/handlers/fetchEligibleCourses.handler";
+import getPassedCoursesMiddleware from "./logic/middlewares/getPassedCourses.middleware";
+import ensureEnrollmentExistsMiddleware from "./logic/middlewares/ensureEnrollmentExists.middleware";
+import validateCreateEnrollmentRequestMiddleware from "./logic/middlewares/validateCreateEnrollmentRequest.middleware";
 
 export default (router: Router) => {
-  router.post("/create", asyncHandler(createEnrollment));
+  router.post(
+    "/create",
+
+    validateCreateEnrollmentRequestMiddleware,
+    ensureEnrollmentExistsMiddleware,
+
+    asyncHandler(createEnrollmentHandler),
+  );
 
   router.post(
     "/enroll/:studentId",
+
     getPassedCoursesMiddleware,
+
     asyncHandler(enrollCourseHandler)
   );
 
@@ -22,5 +33,8 @@ export default (router: Router) => {
     asyncHandler(fetchEligibleCourses)
   );
 
-  router.post("/pass", asyncHandler(coursePassedHandler));
+  router.post(
+    "/pass",
+    asyncHandler(coursePassedHandler),
+  );
 };
