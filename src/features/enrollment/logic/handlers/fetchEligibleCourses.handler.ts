@@ -23,34 +23,38 @@ const handler = async (req: HandlerRequest, res: Response) => {
     studentId: studentId,
   }).populate("courses");
 
+  const courses = await CourseModel.find({});
+  let availableCourses;
   if (!enrolledCourses || !enrolledCourses.length) {
-    return res.status(404).json({ message: "No courses found" });
+    console.log("No enrolled courses found");
+
+    availableCourses = courses;
+  } else {
+    // Filter out the courses that are already enrolled in by this user
+    availableCourses = courses.filter((course) => {
+      return !enrolledCourses.some((enrollment) => {
+        return enrollment.courses.some(
+          (enrolledCourse: any) =>
+            enrolledCourse.courseId.toString() === course._id.toString()
+        );
+      });
+    });
   }
 
-  const courses = await CourseModel.find({});
-  // TODO : filter out the courses that are already enrolled in by this user
-  const availableCourses = courses.filter((course) => {
-    return !enrolledCourses.some((enrollment) =>
-      enrollment.courses.some(
-        (enrolledCourse) => enrolledCourse._id === course._id
-      )
-    );
-  });
-
   // Using the passed courses array, if a prerequisite ID is not found in the passed courses array, remove the course from the available courses
-  // const filteredAvailableCourses = availableCourses.filter((course) => {
-  //   if (course.prerequisites) {
-  //     return course.prerequisites.every((prerequisite) =>
-  //       passedCourses.includes(prerequisite)
-  //     );
-  //   }
-  //   return true;
-  // });
+  const filteredAvailableCourses = availableCourses.filter((course) => {
+    return course.prerequisites.every((prerequisiteId) => {
+      return passedCourses.some(
+        (passedCourse: any) =>
+          passedCourse.courseId.toString() === prerequisiteId.toString()
+      );
+    });
+  });
 
   const response = {
     studentId,
     courses: enrolledCourses.map((enrollment) => enrollment.courses),
-    availableCourses: availableCourses,
+    availableCourses: filteredAvailableCourses,
   };
 
   return res.status(200).json(response);
