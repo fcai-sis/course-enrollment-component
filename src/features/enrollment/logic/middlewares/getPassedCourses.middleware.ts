@@ -1,53 +1,18 @@
-import logger from "../../../../core/logger";
+import * as validator from "express-validator";
 import { Request, Response, NextFunction } from "express";
 
-import * as validator from "express-validator";
-import { CourseEnrollmentModel } from "../../data/models/enrollment.model";
-
-// Custom validation function for studentId
-const validateStudentId = validator
-  .param("studentId")
-  .isString()
-  .withMessage("Invalid student ID");
-
-// Middleware to fetch passedCourses
-const fetchPassedCourses = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { studentId } = req.params;
-
-  const passedCourses = await CourseEnrollmentModel.find({
-    student: studentId,
-    "courses.status": "passed",
-  }).populate("courses.courseId");
-
-  if (!passedCourses || passedCourses.length === 0) {
-    throw new Error("No courses found");
-  }
-
-  const courseIds = passedCourses
-    .map((enrollment) => {
-      return enrollment.courses.map((course) => course.courseId);
-    })
-    .flat();
-  // console.log(courseIds);
-
-  //@ts-ignore
-  req.passedCourses = courseIds;
-
-  next();
-};
+import logger from "../../../../core/logger";
+import { EnrollmentModel } from "../../data/models/enrollment.model";
 
 // Middleware chain
 const middlewares = [
-  validateStudentId,
-  fetchPassedCourses,
+  validator
+    .param("studentId")
+    .isString()
+    .withMessage("Invalid student ID"),
+
   (req: Request, res: Response, next: NextFunction) => {
-    logger.debug(
-      `Validating get passed courses req: ${JSON.stringify(req.body)}`
-    );
+    logger.debug(`Validating get passed courses req: ${JSON.stringify(req.body)}`);
 
     // If any of the validations above failed, return an error response
     const errors = validator.validationResult(req);
@@ -67,6 +32,15 @@ const middlewares = [
     }
 
     next();
+  },
+
+  async (req: Request, _: Response, next: NextFunction) => {
+    const passedCourses = [];
+
+    const { studentId } = req.params;
+
+    // Get the student's enrollment object if it exists
+    const existingEnrollment = await EnrollmentModel.findOne({ studentId });
   },
 ];
 
