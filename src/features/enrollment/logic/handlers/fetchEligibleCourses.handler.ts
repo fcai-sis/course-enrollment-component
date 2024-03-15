@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CourseEnrollmentModel } from "../../data/models/enrollment.model";
+import { EnrollmentModel } from "../../data/models/enrollment.model";
 import { CourseModel } from "@fcai-sis/shared-models";
 import { FetchEligibleCoursesContextType } from "../contexts/fetchEligibleCourses.context";
 
@@ -18,10 +18,9 @@ type HandlerRequest = Request<
 const handler = async (req: HandlerRequest, res: Response) => {
   const { passedCourses } = req.context as FetchEligibleCoursesContextType;
   const studentId = req.params.studentId;
-  // console.log(passedCourses);
 
-  const enrolledCourses = await CourseEnrollmentModel.find({
-    student: studentId,
+  const enrolledCourses = await EnrollmentModel.find({
+    studentId: studentId,
   }).populate("courses");
 
   if (!enrolledCourses || !enrolledCourses.length) {
