@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CourseEnrollmentModel } from "../../data/models/enrollment.model";
+import { EnrollmentModel } from "../../data/models/enrollment.model";
 import { CourseModel } from "@fcai-sis/shared-models";
 
 type HandlerRequest = Request<
@@ -20,7 +20,6 @@ type HandlerRequest = Request<
 const handler = async (req: HandlerRequest, res: Response) => {
   const { courseId, passedCourses } = req.body;
   const studentId = req.params.studentId;
-  console.log(passedCourses);
 
   const course = await CourseModel.findById(courseId);
   if (!course) {
@@ -31,8 +30,8 @@ const handler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
-  const enrollment = await CourseEnrollmentModel.findOne({
-    student: studentId,
+  const enrollment = await EnrollmentModel.findOne({
+    studentId: studentId,
     "courses.courseId": courseId,
   });
 
@@ -60,8 +59,8 @@ const handler = async (req: HandlerRequest, res: Response) => {
     }
   }
 
-  const newEnrollment = await CourseEnrollmentModel.create({
-    student: studentId,
+  const newEnrollment = await EnrollmentModel.create({
+    studentId: studentId,
     courses: [{ courseId, status: "enrolled" }],
   });
 

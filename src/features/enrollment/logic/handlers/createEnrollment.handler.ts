@@ -1,51 +1,54 @@
-import { CourseModel, StudentModel } from "@fcai-sis/shared-models";
 import { Request, Response } from "express";
-import { CourseEnrollmentModel } from "../../data/models/enrollment.model";
+
+type HandlerRequest = Request;
 
 /**
  * Creates a new enrollment for a student in a course
  */
+const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
+  const { enrollment, coursesToEnrollIn } = req.context;
 
-type HandlerRequest = Request<
-  {},
-  {},
-  {
-    studentId: string;
-    courseIds: string[];
-  }
->;
+  // Check if the student is already enrolled in or has passed the courses
+  for (const course of coursesToEnrollIn) {
+    // Check if the course we want to enroll in is already in the enrolled courses
+    // If it does exist, then check if it's status is either enrolled or passed
+    // If so, then we return an error, because you can only enroll in new courses or courses that you have failed
 
-const handler = async (req: HandlerRequest, res: Response) => {
-  const { studentId, courseIds } = req.body;
-
-  // Fetch the student
-  const student = await StudentModel.findById(studentId);
-  if (!student) {
-    return res.status(404).json({ message: "Student not found" });
   }
 
-  const courses = await CourseModel.find({ _id: { $in: courseIds } });
+  // Get the student's passed courses
+  const passedCourses = enrollment.courses.filter(
+    (course: any) => course.status === "passed"
+  );
 
-  // Check if all courses exist
-  if (courses.length !== courseIds.length) {
-    return res.status(404).json({ message: "Course not found" });
+
+  // For each course to enroll in, check it's prerequisites in the `passedCourses` array
+  for (const course of coursesToEnrollIn) {
+    const prerequisitesIds = course.prerequisites;
+
+    for (const prerequisiteId of prerequisitesIds) {
+      const passedPrerequisite = passedCourses.find(
+        (passedCourse: any) => passedCourse.courseId === prerequisiteId
+      );
+
+      if (!passedPrerequisite) {
+        return res.status(400).json({
+          message: "One or more prerequisites are not passed",
+          prerequisite: prerequisiteId,
+        });
+      }
+    }
   }
-  // Create course enrollment
-  const enrollmentCourses = courses.map((course) => ({
-    courseId: course._id,
-    status: "enrolled",
-    seatNumber: 0,
-    finalExamHall: null,
-  }));
 
-  // Add the course to the student's enrolled courses
-  const enrollment = await CourseEnrollmentModel.create({
-    student: studentId,
-    courses: enrollmentCourses,
-  });
+  // Add the courses to the Enrollment
+  for (const course of coursesToEnrollIn) {
+    enrollment.courses.push({ courseId: course._id });
+  }
 
-  return res.status(200).json(enrollment);
+  enrollment.markModified("courses");
+  await enrollment.save();
+
+  return res.status(201).json({ message: "Enrollment created successfully" });
 };
 
-const createEnrollment = handler;
-export default createEnrollment;
+export default createEnrollmentHandler;
