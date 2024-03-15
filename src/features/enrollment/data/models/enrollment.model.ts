@@ -6,8 +6,9 @@ import {
   studentModelName,
 } from "@fcai-sis/shared-models";
 
-export const courseEnrollmentSchema = new Schema({
-  student: {
+// Each row in the enrollment collection represents a student's enrollments throught the years
+export const enrollmentSchema = new Schema({
+  studentId: {
     type: Schema.Types.ObjectId,
     ref: studentModelName,
     required: true,
@@ -27,7 +28,7 @@ export const courseEnrollmentSchema = new Schema({
         },
         seatNumber: {
           type: Number,
-          default: 0,
+          default: null,
         },
         examHall: {
           type: Schema.Types.ObjectId,
@@ -37,17 +38,19 @@ export const courseEnrollmentSchema = new Schema({
       },
     ],
     required: true,
+    default: [],
   },
 });
 
-export type CourseEnrollmentType = InferSchemaType<
-  typeof courseEnrollmentSchema
+export type EnrollmentType = InferSchemaType<
+  typeof enrollmentSchema
 >;
 
-const courseEnrollmentModelName = "CourseEnrollment";
-const CourseEnrollmentModel = mongoose.model<CourseEnrollmentType>(
-  courseEnrollmentModelName,
-  courseEnrollmentSchema
+const enrollmentModelName = "Enrollment";
+
+const EnrollmentModel = mongoose.model<EnrollmentType>(
+  enrollmentModelName,
+  enrollmentSchema
 );
 
-export { CourseEnrollmentModel, courseEnrollmentModelName };
+export { EnrollmentModel, enrollmentModelName };
