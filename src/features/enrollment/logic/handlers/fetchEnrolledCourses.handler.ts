@@ -25,7 +25,16 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
   const response = {
     studentId,
-    courses: enrolledCourses.map((enrollment) => enrollment.courses),
+    courses: enrolledCourses.map((enrollment) => {
+      return enrollment.courses.map((enrolledCourse: any) => {
+        return {
+          courseCode: enrolledCourse.courseCode,
+          status: enrolledCourse.status,
+          seatNumber: enrolledCourse.seatNumber,
+          examHall: enrolledCourse.examHall,
+        };
+      });
+    }),
   };
 
   return res.status(200).json(response);
