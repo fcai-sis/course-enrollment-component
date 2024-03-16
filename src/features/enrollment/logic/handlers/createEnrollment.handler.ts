@@ -35,13 +35,12 @@ const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
     if (existingCourse && existingCourse.status !== "failed") {
       return res.status(400).json({
         message: "You are already enrolled in or have passed this course",
-        courseId: course._id,
+        courseCode: course.code,
       });
     }
   }
 
-  console.log('courses to enroll in', coursesToEnrollIn);
-
+  console.log("courses to enroll in", coursesToEnrollIn);
 
   // For each course to enroll in, check it's prerequisites in the `passedCourses` array
   for (const course of coursesToEnrollIn) {
@@ -64,7 +63,7 @@ const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
 
   // Add the courses to the Enrollment
   for (const course of coursesToEnrollIn) {
-    enrollment.courses.push({ courseId: course._id });
+    enrollment.courses.push({ courseId: course._id, courseCode: course.code });
   }
 
   enrollment.markModified("courses");
