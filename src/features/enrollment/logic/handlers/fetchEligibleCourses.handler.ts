@@ -54,8 +54,27 @@ const fetchEligibleCourses = async (req: HandlerRequest, res: Response) => {
 
   const response = {
     studentId,
-    courses: enrolledCourses.map((enrollment) => enrollment.courses),
-    availableCourses: filteredAvailableCourses,
+    // Return the enrolled courses (course code, status and seat number and exam hall)
+    courses: enrolledCourses.map((enrollment) => {
+      return enrollment.courses.map((enrolledCourse: any) => {
+        return {
+          courseCode: enrolledCourse.courseCode,
+          status: enrolledCourse.status,
+          seatNumber: enrolledCourse.seatNumber,
+          examHall: enrolledCourse.examHall,
+        };
+      });
+    }),
+    availableCourses: filteredAvailableCourses.map((course) => {
+      return {
+        code: course.code,
+        name: course.name,
+        description: course.description,
+        prerequisites: course.prerequisites,
+        department: course.department,
+        creditHours: course.creditHours,
+      };
+    }),
   };
 
   return res.status(200).json(response);
