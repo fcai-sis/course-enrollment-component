@@ -17,7 +17,7 @@ type HandlerRequest = Request<
 >;
 
 const fetchEligibleCourses = async (req: HandlerRequest, res: Response) => {
-  const { passedCourses } = req.context as FetchEligibleCoursesContextType;
+  const { passedCourses } = req.body as FetchEligibleCoursesContextType;
   const studentId = req.params.studentId;
 
   const enrolledCourses = await EnrollmentModel.find({
