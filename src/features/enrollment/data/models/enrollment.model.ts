@@ -21,6 +21,12 @@ export const enrollmentSchema = new Schema({
           ref: courseModelName,
           required: true,
         },
+        courseCode: {
+          type: String,
+          ref: courseModelName,
+          required: true,
+          default: null,
+        },
         status: {
           type: String,
           enum: ["enrolled", "passed", "failed"],
@@ -42,9 +48,7 @@ export const enrollmentSchema = new Schema({
   },
 });
 
-export type EnrollmentType = InferSchemaType<
-  typeof enrollmentSchema
->;
+export type EnrollmentType = InferSchemaType<typeof enrollmentSchema>;
 
 const enrollmentModelName = "Enrollment";
 
