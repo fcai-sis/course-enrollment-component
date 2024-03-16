@@ -6,15 +6,15 @@ import { EnrollmentModel } from "../../data/models/enrollment.model";
  */
 
 type HandlerRequest = Request<
-  {},
-  {},
   {
     studentId: string;
-  }
+  },
+  {},
+  {}
 >;
 
 const handler = async (req: HandlerRequest, res: Response) => {
-  const { studentId } = req.body;
+  const { studentId } = req.params;
 
   const enrolledCourses = await EnrollmentModel.find({
     studentId: studentId,
