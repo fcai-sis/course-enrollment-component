@@ -48,9 +48,9 @@ const middlewares = [
       );
     }
 
-    // Add the passed courses to the request context
-    req.context = {
-      ...req.context,
+    // Add the passed courses to the request body
+    req.body = {
+      ...req.body,
       passedCourses,
     };
 
