@@ -1,31 +1,51 @@
-import { Document } from 'mongoose';
-import { Request, Response, NextFunction } from 'express';
-import { CourseType, StudentType } from '@fcai-sis/shared-models';
+import * as validator from "express-validator";
+import { Request, Response, NextFunction } from "express";
+import logger from "../../../../core/logger";
+import { EnrollmentModel } from "../../data/models/enrollment.model";
 
-import { EnrollmentModel, EnrollmentType } from '../../../enrollment/data/models/enrollment.model';
+const ensureEnrollmentExistsMiddleware = [
+  validator
+    .body("studentId")
+    .exists()
+    .withMessage("Student ID is required")
+    .isMongoId()
+    .withMessage("Invalid student ID")
+    .custom(async (value) => {
+      // Get the student's enrollment object if it exists
+      const existingEnrollment = await EnrollmentModel.findOne({
+        studentId: value,
+      });
+      if (!existingEnrollment) {
+        throw new Error("Enrollment not found");
+      }
 
-type MiddlewareRequest = Request<{}, {}, {
-  studentId: string;
-  enrollment: EnrollmentType & Document;
-  coursesToEnrollIn: (CourseType & Document)[];
-  student: StudentType & Document;
-}>;
+      return true;
+    }),
 
-const ensureEnrollmentExistsMiddleware = async (req: MiddlewareRequest, _: Response, next: NextFunction) => {
-  const { studentId } = req.body;
+  (req: Request, res: Response, next: NextFunction) => {
+    logger.debug(
+      `Validating ensure enrollment exists middleware: ${JSON.stringify(
+        req.body
+      )}`
+    );
+    const errors = validator.validationResult(req);
 
-  // Get the student's enrollment object if it exists
-  const existingEnrollment = await EnrollmentModel.findOne({ studentId });
+    if (!errors.isEmpty()) {
+      logger.debug(
+        `Validation failed for ensure enrollment exists middleware: ${JSON.stringify(
+          req.body
+        )}`
+      );
 
-  // If the enrollment doesn't exist, create a new one
-  // Otherwise, add the new courses to the existing enrollment
-  if (!existingEnrollment) {
-    req.body.enrollment = await EnrollmentModel.create({ studentId, courses: [] });
-  } else {
-    req.body.enrollment = existingEnrollment;
-  }
+      return res.status(400).json({
+        error: {
+          message: errors.array()[0].msg,
+        },
+      });
+    }
 
-  next();
-}
+    next();
+  },
+];
 
 export default ensureEnrollmentExistsMiddleware;
