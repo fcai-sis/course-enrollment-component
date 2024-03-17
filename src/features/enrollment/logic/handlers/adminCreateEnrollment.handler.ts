@@ -4,6 +4,7 @@ import { CourseType } from "@fcai-sis/shared-models";
 import { EnrollmentModel } from "../../data/models/enrollment.model";
 import { Document } from "mongoose";
 
+// TODO : Refactor to include authorization later
 type HandlerRequest = Request<
   {},
   {},
