@@ -8,6 +8,7 @@ import ensureEnrollmentExistsMiddleware from "./logic/middlewares/ensureEnrollme
 import validateCreateEnrollmentRequestMiddleware from "./logic/middlewares/validateCreateEnrollmentRequest.middleware";
 import fetchEnrolledCourses from "./logic/handlers/fetchEnrolledCourses.handler";
 import updateEnrollmentHandler from "./logic/handlers/updateEnrollment.handler";
+import adminCreateEnrollmentHandler from "./logic/handlers/adminCreateEnrollment.handler";
 
 export default (router: Router) => {
   router.post(
@@ -16,6 +17,13 @@ export default (router: Router) => {
     ensureEnrollmentExistsMiddleware,
     asyncHandler(createEnrollmentHandler)
   );
+
+  router.post (
+    "/admin/create",
+    validateCreateEnrollmentRequestMiddleware,
+    ensureEnrollmentExistsMiddleware,
+    asyncHandler(adminCreateEnrollmentHandler)
+  )
 
   router.get(
     "/courses/:studentId",
