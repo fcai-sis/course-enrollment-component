@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 
 import { EnrollmentType } from "../../data/models/enrollment.model";
 
+/**
+ * Update an existing enrollment's course properties (status, seat number, exam hall)
+ */
 type HandlerRequest = Request<
   {
     studentId: string;
@@ -16,36 +19,16 @@ type HandlerRequest = Request<
   }
 >;
 
-/**
- * Update an existing enrollment's course properties (status, seat number, exam hall)
- */
 
 // TODO : fix types
 const updateEnrollmentHandler = async (req: Request, res: Response) => {
   const { enrollment } = req.body;
-  const { courseId, status, seatNumber, examHall } = req.body;
+  const { status, seatNumber, examHall } = req.body;
 
-  const courseToUpdate = enrollment.courses.find(
-    (course: any) => course.courseId.toString() === courseId.toString()
-  );
-
-  if (!courseToUpdate) {
-    return res.status(404).json({
-      message: "Course not found in enrollment",
-    });
-  }
-
-  if (status) {
-    courseToUpdate.status = status;
-  }
-
-  if (seatNumber) {
-    courseToUpdate.seatNumber = seatNumber;
-  }
-
-  if (examHall) {
-    courseToUpdate.examHall = examHall;
-  }
+  // Update the enrollment object
+  if (status) enrollment.status = status;
+  if (seatNumber) enrollment.seatNumber = seatNumber;
+  if (examHall) enrollment.examHall = examHall;
 
   await enrollment.save();
 
