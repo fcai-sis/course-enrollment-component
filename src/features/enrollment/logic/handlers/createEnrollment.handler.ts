@@ -1,15 +1,19 @@
 import { Request, Response } from "express";
 import { CourseType } from "@fcai-sis/shared-models";
 
-import { EnrollmentType } from "../../data/models/enrollment.model";
+import {
+  EnrollmentType,
+  EnrollmentModel,
+} from "../../data/models/enrollment.model";
 import { Document } from "mongoose";
 
 type HandlerRequest = Request<
   {},
   {},
   {
-    enrollment: EnrollmentType & Document;
-    coursesToEnrollIn: (CourseType & Document)[];
+    enrollments: (EnrollmentType & Document)[];
+    courseToEnrollIn: CourseType & Document;
+    studentId: string;
   }
 >;
 
@@ -17,59 +21,55 @@ type HandlerRequest = Request<
  * Creates a new enrollment for a student in a course
  */
 const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
-  const { enrollment, coursesToEnrollIn } = req.body;
+  const { enrollments, courseToEnrollIn, studentId } = req.body;
 
   // Get the student's passed courses
-  const passedCourses = enrollment.courses.filter(
-    (course: any) => course.status === "passed"
-  );
+  const passedCourses = enrollments
+    .filter((enrollment) => enrollment.status === "passed")
+    .map((enrollment) => enrollment.courseId);
 
-  // Check if the student is already enrolled in or has passed the courses
-  for (const course of coursesToEnrollIn) {
-    // Check if the course we want to enroll in is already in the enrolled courses
-    const existingCourse = enrollment.courses.find((enrolledCourse: any) => {
-      return enrolledCourse.courseId.toString() === course._id.toString();
-    });
-
+  // Check if the courseToEnrollIn is already in the enrollments array
+  for (const enrollment of enrollments) {
     // If the course does exist, and its status is either enrolled or passed (i.e. not failed), return an error
-    if (existingCourse && existingCourse.status !== "failed") {
+    if (
+      enrollment.courseId.toString() === courseToEnrollIn._id.toString() &&
+      enrollment.status !== "failed"
+    ) {
       return res.status(400).json({
-        message: "You are already enrolled in or have passed this course",
-        courseCode: course.code,
+        message: "Course already enrolled in",
+        course: courseToEnrollIn.code,
       });
     }
   }
 
-  console.log("courses to enroll in", coursesToEnrollIn);
+  console.log("course to enroll in", courseToEnrollIn);
 
-  // For each course to enroll in, check it's prerequisites in the `passedCourses` array
-  for (const course of coursesToEnrollIn) {
-    const prerequisitesIds = course.prerequisites;
+  // Check if the student has passed all prerequisites for the course
+  const prerequisites = courseToEnrollIn.prerequisites;
 
-    for (const prerequisiteId of prerequisitesIds) {
-      const passedPrerequisite = passedCourses.find(
-        (passedCourse: any) =>
-          passedCourse.courseId.toString() === prerequisiteId.toString()
-      );
-
-      if (!passedPrerequisite) {
-        return res.status(400).json({
-          message: "One or more prerequisites are not passed",
-          prerequisite: prerequisiteId,
-        });
-      }
+  // TESTER : IF THIS FAILS CHANGE TO toString()
+  for (const prerequisite of prerequisites) {
+    if (!passedCourses.includes(prerequisite)) {
+      return res.status(400).json({
+        message: "Prerequisite not met",
+        prerequisite,
+      });
     }
   }
 
-  // Add the courses to the Enrollment
-  for (const course of coursesToEnrollIn) {
-    enrollment.courses.push({ courseId: course._id, courseCode: course.code });
-  }
+  // Create a new enrollment
+  const newEnrollment = new EnrollmentModel({
+    studentId: studentId,
+    courseId: courseToEnrollIn._id,
+    courseCode: courseToEnrollIn.code,
+  });
 
-  enrollment.markModified("courses");
-  await enrollment.save();
+  await newEnrollment.save();
 
-  return res.status(201).json({ message: "Enrollment created successfully" });
+  return res.status(201).json({
+    message: "Enrollment created successfully",
+    enrollment: newEnrollment,
+  });
 };
 
 export default createEnrollmentHandler;
