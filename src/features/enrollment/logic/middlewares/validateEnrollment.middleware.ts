@@ -12,11 +12,13 @@ type MiddlewareRequest = Request<
   {},
   {
     studentId: string;
-    enrollment: EnrollmentType & Document;
-    coursesToEnrollIn: (CourseType & Document)[];
+    enrollments: (EnrollmentType & Document)[];
+    courseToEnrollIn: CourseType & Document;
     student: StudentType & Document;
   }
 >;
+
+// TODO: revise this with youssef gala
 
 const validateEnrollmentMiddleware = async (
   req: MiddlewareRequest,
@@ -25,19 +27,20 @@ const validateEnrollmentMiddleware = async (
 ) => {
   const { studentId } = req.body;
 
-  // Get the student's enrollment object if it exists
-  const existingEnrollment = await EnrollmentModel.findOne({ studentId });
+  // Get all enrollments with this student ID
+  const existingEnrollments = await EnrollmentModel.find({
+    studentId,
+  })
 
   // If the enrollment doesn't exist, create a new one
-  // Otherwise, add the new courses to the existing enrollment
-  if (!existingEnrollment) {
-    req.body.enrollment = await EnrollmentModel.create({
-      studentId,
-      courses: [],
-    });
+  // Otherwise, add the new course to the existing enrollment
+  if (existingEnrollments.length === 0) {
+    
+    req.body.enrollments = [];
   } else {
-    req.body.enrollment = existingEnrollment;
+    req.body.enrollments = existingEnrollments;
   }
+  
 
   next();
 };
