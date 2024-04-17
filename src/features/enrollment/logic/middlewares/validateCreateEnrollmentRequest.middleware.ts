@@ -24,19 +24,7 @@ const validateCreateEnrollmentRequestMiddleware = [
     }),
 
   validator
-    .body("courses")
-    .exists()
-    .withMessage("Courses to enroll in is required")
-    .isArray()
-    .withMessage("At least one course is required")
-    .custom((_, { req }) => {
-      req.body.coursesToEnrollIn = [];
-
-      return true;
-    }),
-
-  validator
-    .body("courses.*")
+    .body("course")
     .custom((value) => {
       // Course code must follow this pattern: 2-4 uppercase letters followed by 3 digits
       const pattern = /^[A-Z]{2,4}\d{3}$/;
@@ -50,14 +38,14 @@ const validateCreateEnrollmentRequestMiddleware = [
     })
     .withMessage("Invalid course code")
     .custom(async (value, { req }) => {
-      // Fetch the course
+      // Ensure course exists
       const course = await CourseModel.findOne({ code: value });
 
       if (!course) {
         throw new Error("Course not found");
       }
 
-      req.body.coursesToEnrollIn.push(course);
+      req.body.courseToEnrollIn = course;
 
       return true;
     }),
