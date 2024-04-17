@@ -34,19 +34,22 @@ const middlewares = [
   },
 
   async (req: Request, _: Response, next: NextFunction) => {
-    const passedCourses = [];
+    const passedCourses : any = [];
 
     const { studentId } = req.params;
 
-    // Get the student's enrollment object if it exists
-    const existingEnrollment = await EnrollmentModel.findOne({ studentId });
-    if (existingEnrollment) {
-      passedCourses.push(
-        ...existingEnrollment.courses.filter(
-          (course: any) => course.status === "passed"
-        )
-      );
-    }
+    // Get all enrollments with this student ID that have the course status marked as "passed"
+    const enrollments = await EnrollmentModel.find({
+      studentId,
+      status: "passed",
+    });
+
+    // Append the course ID to the passedCourses array
+    enrollments.forEach((enrollment) => {
+      passedCourses.push(enrollment.courseId);
+    });
+    
+   
 
     // Add the passed courses to the request body
     req.body = {
