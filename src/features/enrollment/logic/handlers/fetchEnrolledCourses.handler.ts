@@ -16,24 +16,21 @@ type HandlerRequest = Request<
 const handler = async (req: HandlerRequest, res: Response) => {
   const { studentId } = req.params;
 
+  // Find all enrollments with this student ID
   const enrolledCourses = await EnrollmentModel.find({
-    studentId: studentId,
-  }).populate("courses");
-  if (!enrolledCourses || !enrolledCourses.length) {
-    return res.status(404).json({ message: "No courses found" });
-  }
+    studentId,
+  });
 
   const response = {
     studentId,
+    // Return the enrolled courses (course code, status and seat number and exam hall)
     courses: enrolledCourses.map((enrollment) => {
-      return enrollment.courses.map((enrolledCourse: any) => {
-        return {
-          courseCode: enrolledCourse.courseCode,
-          status: enrolledCourse.status,
-          seatNumber: enrolledCourse.seatNumber,
-          examHall: enrolledCourse.examHall,
-        };
-      });
+      return {
+        courseCode: enrollment.courseCode,
+        status: enrollment.status,
+        seatNumber: enrollment.seatNumber,
+        examHall: enrollment.examHall,
+      };
     }),
   };
 
