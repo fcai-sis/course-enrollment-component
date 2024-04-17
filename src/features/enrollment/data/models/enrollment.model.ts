@@ -13,38 +13,41 @@ export const enrollmentSchema = new Schema({
     ref: studentModelName,
     required: true,
   },
-  courses: {
-    type: [
-      {
-        courseId: {
-          type: Schema.Types.ObjectId,
-          ref: courseModelName,
-          required: true,
-        },
-        courseCode: {
-          type: String,
-          ref: courseModelName,
-          required: true,
-          default: null,
-        },
-        status: {
-          type: String,
-          enum: ["enrolled", "passed", "failed"],
-          default: "enrolled",
-        },
-        seatNumber: {
-          type: Number,
-          default: null,
-        },
-        examHall: {
-          type: Schema.Types.ObjectId,
-          ref: hallModelName,
-          default: null,
-        },
-      },
-    ],
+
+  groupName: {
+    type: String,
     required: true,
-    default: [],
+  },
+
+  semesterId: {
+    type: Schema.Types.ObjectId,
+    ref: "Semester",
+    required: true,
+  },
+  courseId: {
+    type: Schema.Types.ObjectId,
+    ref: courseModelName,
+    required: true,
+  },
+  courseCode: {
+    type: String,
+    ref: courseModelName,
+    required: true,
+    default: null,
+  },
+  status: {
+    type: String,
+    enum: ["enrolled", "passed", "failed"],
+    default: "enrolled",
+  },
+  seatNumber: {
+    type: Number,
+    default: null,
+  },
+  examHall: {
+    type: Schema.Types.ObjectId,
+    ref: hallModelName,
+    default: null,
   },
 });
 
