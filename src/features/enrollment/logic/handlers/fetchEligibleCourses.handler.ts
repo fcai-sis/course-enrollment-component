@@ -20,50 +20,48 @@ const fetchEligibleCourses = async (req: HandlerRequest, res: Response) => {
   const { passedCourses } = req.body as FetchEligibleCoursesContextType;
   const studentId = req.params.studentId;
 
-  const enrolledCourses = await EnrollmentModel.find({
-    studentId: studentId,
-  }).populate("courses");
+  // Find all enrollments with this student ID
+  const enrollments = await EnrollmentModel.find({
+    studentId,
+  });
 
+  // Find all courses that are available for enrollment
   const courses = await CourseModel.find({});
   let availableCourses;
-  if (!enrolledCourses || !enrolledCourses.length) {
-    console.log("No enrolled courses found");
 
+  // If there's no enrollment, return all available courses
+  if (!enrollments) {
     availableCourses = courses;
   } else {
-    // Filter out the courses that are already enrolled in by this user
+    // If there are enrollments, remove courses that the student has already enrolled in (any enrollment with a status of "enrolled" or "passed")
+    const enrolledCourses = enrollments.filter((enrollment) => {
+      return enrollment.status === "enrolled" || enrollment.status === "passed";
+    });
+
     availableCourses = courses.filter((course) => {
       return !enrolledCourses.some((enrollment) => {
-        return enrollment.courses.some(
-          (enrolledCourse: any) =>
-            enrolledCourse.courseId.toString() === course._id.toString()
-        );
+        return enrollment.courseId === course._id;
       });
     });
   }
 
   // Using the passed courses array, if a prerequisite ID is not found in the passed courses array, remove the course from the available courses
   const filteredAvailableCourses = availableCourses.filter((course) => {
-    return course.prerequisites.every((prerequisiteId) => {
-      return passedCourses.some(
-        (passedCourse: any) =>
-          passedCourse.courseId.toString() === prerequisiteId.toString()
-      );
+    return course.prerequisites.every((prerequisite) => {
+      return passedCourses.includes(prerequisite.toString());
     });
   });
 
   const response = {
     studentId,
     // Return the enrolled courses (course code, status and seat number and exam hall)
-    courses: enrolledCourses.map((enrollment) => {
-      return enrollment.courses.map((enrolledCourse: any) => {
-        return {
-          courseCode: enrolledCourse.courseCode,
-          status: enrolledCourse.status,
-          seatNumber: enrolledCourse.seatNumber,
-          examHall: enrolledCourse.examHall,
-        };
-      });
+    courses: enrollments.map((enrollment) => {
+      return {
+        courseCode: enrollment.courseCode,
+        status: enrollment.status,
+        seatNumber: enrollment.seatNumber,
+        examHall: enrollment.examHall,
+      };
     }),
     availableCourses: filteredAvailableCourses.map((course) => {
       return {
