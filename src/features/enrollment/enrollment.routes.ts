@@ -16,7 +16,6 @@ export default (router: Router) => {
     "/create",
     validateCreateEnrollmentRequestMiddleware,
     validateEnrollmentMiddleware,
-    getPassedCoursesMiddleware,
     asyncHandler(createEnrollmentHandler)
   );
 
