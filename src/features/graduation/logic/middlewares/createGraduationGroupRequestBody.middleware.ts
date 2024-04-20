@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import * as validator from "express-validator";
 import { EnrollmentModel } from "features/enrollment/data/models/enrollment.model";
+import GraduationProjectTeamModel from "features/graduation/data/models/gpt.model";
 
 const middlewares = [
-
   validator
     .body("semester")
     .exists()
@@ -51,6 +51,19 @@ const middlewares = [
           throw new Error("All enrollments must belong to the same semester");
         }
       }
+    })
+    .custom(async (value) => {
+      // Check if the enrollments are not already in a graduation project group
+      const graduationProject = await GraduationProjectTeamModel.findOne({
+        enrollments: { $in: value },
+      });
+
+      if (graduationProject) {
+        throw new Error(
+          "Some enrollments are already in a graduation project group"
+        );
+      }
+      return true;
     }),
 
   validator
@@ -121,8 +134,6 @@ const middlewares = [
     }
 
     req.body.groupCode = req.body.groupCode.trim();
-
-    
 
     next();
   },
