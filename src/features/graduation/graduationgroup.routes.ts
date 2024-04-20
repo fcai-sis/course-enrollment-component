@@ -3,6 +3,8 @@ import CreateGraduationGroupHandler from "./logic/handlers/createGraduationGroup
 import { Router } from "express";
 import getGraduationGroupHandler from "./logic/handlers/getGraduationGroup.handler";
 import ensureGroupIdInParamsMiddleware from "./logic/middlewares/ensureGroupIdInParams.middleware";
+import updateGraduationGroupHandler from "./logic/handlers/updateGraduationGroup.handler";
+import updateGraduationGroupRequestBodyMiddleware from "./logic/middlewares/updateGraduationGroupRequestBody.middleware";
 
 const graduationGroupRoutes = (router: Router) => {
   /**
@@ -14,6 +16,17 @@ const graduationGroupRoutes = (router: Router) => {
 
     asyncHandler(CreateGraduationGroupHandler)
   );
+
+  /**
+   * Update a graduation group
+   */
+
+    router.patch(
+        "/update/:groupId",
+        ensureGroupIdInParamsMiddleware,
+        updateGraduationGroupRequestBodyMiddleware,
+        asyncHandler(updateGraduationGroupHandler)
+        );
 
   /**
    * Get a graduation group by its group code
