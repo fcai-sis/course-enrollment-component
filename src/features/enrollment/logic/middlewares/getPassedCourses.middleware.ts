@@ -1,65 +1,36 @@
-import * as validator from "express-validator";
+import { StudentModel } from "@fcai-sis/shared-models";
 import { Request, Response, NextFunction } from "express";
 
-import logger from "../../../../core/logger";
 import { EnrollmentModel } from "../../data/models/enrollment.model";
 
 // Middleware chain
-const middlewares = [
-  validator.param("studentId").isString().withMessage("Invalid student ID"),
+const getPassedCoursesMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+  const { userId } = req.body.user;
+  const student = await StudentModel.findOne({ userId });
 
-  (req: Request, res: Response, next: NextFunction) => {
-    logger.debug(
-      `Validating get passed courses req: ${JSON.stringify(req.body)}`
-    );
+  if (!student) return res.status(404).json({ message: "Student not found" });
 
-    // If any of the validations above failed, return an error response
-    const errors = validator.validationResult(req);
+  const studentId = student._id;
+  const passedCourses: any = [];
 
-    if (!errors.isEmpty()) {
-      logger.debug(
-        `Validation failed for get passed courses req: ${JSON.stringify(
-          req.body
-        )}`
-      );
+  // Get all enrollments with this student ID that have the course status marked as "passed"
+  const enrollments = await EnrollmentModel.find({
+    studentId,
+    status: "passed",
+  });
 
-      return res.status(400).json({
-        error: {
-          message: errors.array()[0].msg,
-        },
-      });
-    }
+  // Append the course ID to the passedCourses array
+  enrollments.forEach((enrollment) => {
+    passedCourses.push(enrollment.courseId);
+  });
 
-    next();
-  },
+  // Add the passed courses to the request body
+  req.body = {
+    ...req.body,
+    passedCourses,
+  };
 
-  async (req: Request, _: Response, next: NextFunction) => {
-    const passedCourses : any = [];
+  next();
+};
 
-    const { studentId } = req.params;
-
-    // Get all enrollments with this student ID that have the course status marked as "passed"
-    const enrollments = await EnrollmentModel.find({
-      studentId,
-      status: "passed",
-    });
-
-    // Append the course ID to the passedCourses array
-    enrollments.forEach((enrollment) => {
-      passedCourses.push(enrollment.courseId);
-    });
-    
-   
-
-    // Add the passed courses to the request body
-    req.body = {
-      ...req.body,
-      passedCourses,
-    };
-
-    next();
-  },
-];
-
-const getPassedCoursesMiddleware = middlewares;
 export default getPassedCoursesMiddleware;

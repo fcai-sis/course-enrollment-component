@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CourseType } from "@fcai-sis/shared-models";
+import { CourseType, StudentType } from "@fcai-sis/shared-models";
 
 import {
   EnrollmentType,
@@ -13,7 +13,7 @@ type HandlerRequest = Request<
   {
     enrollments: (EnrollmentType & Document)[];
     courseToEnrollIn: CourseType & Document;
-    studentId: string;
+    student: StudentType & Document;
   }
 >;
 
@@ -21,7 +21,7 @@ type HandlerRequest = Request<
  * Creates a new enrollment for a student in a course
  */
 const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
-  const { enrollments, courseToEnrollIn, studentId } = req.body;
+  const { enrollments, courseToEnrollIn, student } = req.body;
 
   // Get the student's passed courses
   const passedCourses = enrollments
@@ -59,9 +59,8 @@ const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
 
   // Create a new enrollment
   const newEnrollment = new EnrollmentModel({
-    studentId: studentId,
+    studentId: student.studentId,
     courseId: courseToEnrollIn._id,
-    courseCode: courseToEnrollIn.code,
   });
 
   await newEnrollment.save();

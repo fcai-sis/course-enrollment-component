@@ -1,49 +1,23 @@
 import * as validator from "express-validator";
 import { Request, Response, NextFunction } from "express";
-import { CourseModel, StudentModel } from "@fcai-sis/shared-models";
+import { CourseModel } from "@fcai-sis/shared-models";
 import logger from "../../../../core/logger";
 
+/*
+ * Middleware to validate the request body for creating an enrollment
+ *
+ * Attaches the student and course to enroll in to the request body
+ **/
 const validateCreateEnrollmentRequestMiddleware = [
   validator
-    .body("studentId")
+    .body("courseCode")
     .exists()
-    .withMessage("Student ID is required")
-    .isMongoId()
-    .withMessage("Invalid student ID")
-    .custom(async (value, { req }) => {
-      // Fetch the student
-      const student = await StudentModel.findById(value);
-
-      if (!student) {
-        throw new Error("Student not found");
-      }
-
-      req.body.student = student;
-
-      return true;
-    }),
-
-  validator
-    .body("course")
-    .custom((value) => {
-      // Course code must follow this pattern: 2-4 uppercase letters followed by 3 digits
-      const pattern = /^[A-Z]{2,4}\d{3}$/;
-      if (!pattern.test(value)) {
-        throw new Error(
-          "Invalid course code, must be 2-4 uppercase letters followed by 3 digits"
-        );
-      }
-
-      return true;
-    })
-    .withMessage("Invalid course code")
+    .withMessage("Course code is required")
     .custom(async (value, { req }) => {
       // Ensure course exists
       const course = await CourseModel.findOne({ code: value });
 
-      if (!course) {
-        throw new Error("Course not found");
-      }
+      if (!course) throw new Error("Course not found");
 
       req.body.courseToEnrollIn = course;
 
