@@ -13,27 +13,15 @@ export const enrollmentSchema = new Schema({
     ref: studentModelName,
     required: true,
   },
-
-  groupName: {
-    type: String,
-    required: true,
-  },
-
   semesterId: {
     type: Schema.Types.ObjectId,
-    ref: "Semester",
+    ref: "Semester", // TODO: Use semesterModelName
     required: true,
   },
   courseId: {
     type: Schema.Types.ObjectId,
     ref: courseModelName,
     required: true,
-  },
-  courseCode: {
-    type: String,
-    ref: courseModelName,
-    required: true,
-    default: null,
   },
   status: {
     type: String,
