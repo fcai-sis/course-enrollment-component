@@ -5,6 +5,8 @@ import getGraduationGroupHandler from "./logic/handlers/getGraduationGroup.handl
 import ensureGroupIdInParamsMiddleware from "./logic/middlewares/ensureGroupIdInParams.middleware";
 import updateGraduationGroupHandler from "./logic/handlers/updateGraduationGroup.handler";
 import updateGraduationGroupRequestBodyMiddleware from "./logic/middlewares/updateGraduationGroupRequestBody.middleware";
+import createGraduationGroupRequestBodyMiddleware from "./logic/middlewares/createGraduationGroupRequestBody.middleware";
+import { paginationQueryParamsMiddleware } from "@fcai-sis/shared-middlewares";
 
 const graduationGroupRoutes = (router: Router) => {
   /**
@@ -13,7 +15,7 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.post(
     "/create",
-
+    createGraduationGroupRequestBodyMiddleware,
     asyncHandler(CreateGraduationGroupHandler)
   );
 
@@ -21,12 +23,12 @@ const graduationGroupRoutes = (router: Router) => {
    * Update a graduation group
    */
 
-    router.patch(
-        "/update/:groupId",
-        ensureGroupIdInParamsMiddleware,
-        updateGraduationGroupRequestBodyMiddleware,
-        asyncHandler(updateGraduationGroupHandler)
-        );
+  router.patch(
+    "/update/:groupId",
+    ensureGroupIdInParamsMiddleware,
+    updateGraduationGroupRequestBodyMiddleware,
+    asyncHandler(updateGraduationGroupHandler)
+  );
 
   /**
    * Get a graduation group by its group code
@@ -43,7 +45,7 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.get(
     "/",
-
+    paginationQueryParamsMiddleware,
     asyncHandler(getGraduationGroupHandler)
   );
 };
