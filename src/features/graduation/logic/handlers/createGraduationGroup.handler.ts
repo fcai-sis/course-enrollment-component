@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { Request, Response } from "express";
-import GraduationProjectTeamModel from "../../data/models/gpt.model";
+import GraduationProjectTeamModel from "../../data/models/graduationteam.model";
 import { EnrollmentType } from "../../../enrollment/data/models/enrollment.model";
 
 type HandlerRequest = Request<

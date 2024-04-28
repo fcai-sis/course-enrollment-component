@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { GraduationProjectTeamModel } from "../../data/models/gpt.model";
+import { GraduationProjectTeamModel } from "../../data/models/graduationteam.model";
 import mongoose from "mongoose";
 import { EnrollmentType } from "../../../enrollment/data/models/enrollment.model";
 

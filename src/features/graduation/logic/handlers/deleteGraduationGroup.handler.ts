@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { GraduationProjectTeamModel } from "../../data/models/gpt.model";
+import { GraduationProjectTeamModel } from "../../data/models/graduationteam.model";
 
 type HandlerRequest = Request<
   {

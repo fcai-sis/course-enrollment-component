@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as validator from "express-validator";
 import { EnrollmentModel } from "features/enrollment/data/models/enrollment.model";
-import GraduationProjectTeamModel from "features/graduation/data/models/gpt.model";
+import GraduationProjectTeamModel from "features/graduation/data/models/graduationteam.model";
 
 const middlewares = [
   validator
