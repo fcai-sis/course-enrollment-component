@@ -1,9 +1,11 @@
+import { semesterModelName } from "@fcai-sis/shared-models";
+import { enrollmentModelName } from "../../../enrollment/data/models/enrollment.model";
 import mongoose, { InferSchemaType } from "mongoose";
 
 const graduationProjectTeamSchema = new mongoose.Schema({
   enrollments: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: "Enrollment",
+    ref: enrollmentModelName,
   },
 
   instructorTeachings: {
@@ -18,7 +20,7 @@ const graduationProjectTeamSchema = new mongoose.Schema({
 
   semester: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Semester",
+    ref: semesterModelName,
   },
 });
 
