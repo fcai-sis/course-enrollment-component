@@ -1,3 +1,4 @@
+import { SemesterModel } from "@fcai-sis/shared-models";
 import { Request, Response, NextFunction } from "express";
 import * as validator from "express-validator";
 import { EnrollmentModel } from "features/enrollment/data/models/enrollment.model";
