@@ -7,9 +7,9 @@ type HandlerRequest = Request<{ evaluationQuestionId: string }, {}, {}>;
  * Delete a Evaluation Question by its id.
  */
 const handler = async (req: HandlerRequest, res: Response) => {
-  const scheduleId = req.params.evaluationQuestionId;
+  const evaluationQuestionId = req.params.evaluationQuestionId;
 
-  const evaluationQuestion = await EvaluationQuestionModel.findByIdAndDelete(scheduleId);
+  const evaluationQuestion = await EvaluationQuestionModel.findByIdAndDelete(evaluationQuestionId);
 
   if (!evaluationQuestion) {
     return res.status(404).json({
