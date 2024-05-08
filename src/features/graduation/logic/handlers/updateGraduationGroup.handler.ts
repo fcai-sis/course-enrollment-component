@@ -22,10 +22,15 @@ type HandlerRequest = Request<
 
 const handler = async (req: HandlerRequest, res: Response) => {
   const { groupId } = req.params;
+  const { enrollments, instructorTeachings, assistantTeachings, semester } =
+    req.body;
   const graduationProject = await GraduationProjectTeamModel.findByIdAndUpdate(
     groupId,
     {
-      ...req.body,
+      ...(enrollments && { enrollments }),
+      ...(instructorTeachings && { instructorTeachings }),
+      ...(assistantTeachings && { assistantTeachings }),
+      ...(semester && { semester }),
     },
     {
       new: true,
