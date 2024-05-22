@@ -2,8 +2,7 @@ import { Request, Response } from "express";
 import { TokenPayload } from "@fcai-sis/shared-middlewares";
 import { StudentModel } from "@fcai-sis/shared-models";
 
-import { EnrollmentModel } from "../../data/models/enrollment.model";
-
+import { EnrollmentModel } from "@fcai-sis/shared-models";
 
 type HandlerRequest = Request<
   {},
@@ -26,15 +25,25 @@ const handler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
-  const studentId = student?.studentId;
+  const studentId = student?._id;
 
   // Find all enrollments with this student ID
-  const enrolledCourses = await EnrollmentModel.find({ studentId }).populate("courseId");
+  const enrolledCourses = await EnrollmentModel.find(
+    { studentId },
+    {
+      __v: 0,
+      _id: 0,
+      studentId: 0,
+    }
+  ).populate({
+    path: "courseId",
+    select: "code -_id",
+  });
 
   const response = {
     studentId,
     // Return the enrolled courses (course code, status and seat number and exam hall)
-    courses: enrolledCourses
+    courses: enrolledCourses,
   };
 
   return res.status(200).json(response);
