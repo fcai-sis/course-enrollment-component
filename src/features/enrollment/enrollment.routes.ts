@@ -9,6 +9,7 @@ import fetchEligibleCourses from "./logic/handlers/fetchEligibleCourses.handler"
 import getPassedCoursesMiddleware from "./logic/middlewares/getPassedCourses.middleware";
 import validateEnrollmentMiddleware from "./logic/middlewares/validateEnrollment.middleware";
 import validateCreateEnrollmentRequestMiddleware from "./logic/middlewares/validateCreateEnrollmentRequest.middleware";
+import validateUpdateEnrollmentRequestBodyMiddleware from "./logic/middlewares/updateEnrollmentRequestBody.middleware";
 
 export default (router: Router) => {
   router.post(
@@ -45,8 +46,8 @@ export default (router: Router) => {
   router.patch(
     "/update",
 
-    checkRole([Role.STUDENT]),
-
+    checkRole([Role.EMPLOYEE, Role.ADMIN]),
+    validateUpdateEnrollmentRequestBodyMiddleware,
     asyncHandler(updateEnrollmentHandler)
   );
 };
