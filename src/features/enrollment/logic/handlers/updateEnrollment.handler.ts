@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { EnrollmentType } from "../../data/models/enrollment.model";
+import { IEnrollment, IHall } from "@fcai-sis/shared-models";
 
 /**
  * Update an existing enrollment's course properties (status, seat number, exam hall)
@@ -11,24 +11,22 @@ type HandlerRequest = Request<
   },
   {},
   {
-    enrollment: EnrollmentType & Document;
-    courseId: string;
+    enrollment: IEnrollment & Document;
     status?: "enrolled" | "passed" | "failed";
     seatNumber?: number;
-    examHall?: string;
+    examHall?: IHall & Document;
   }
 >;
 
-
-// TODO : fix types
-const updateEnrollmentHandler = async (req: Request, res: Response) => {
+// TODO : add middleware
+const updateEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
   const { enrollment } = req.body;
   const { status, seatNumber, examHall } = req.body;
 
   // Update the enrollment object
   if (status) enrollment.status = status;
   if (seatNumber) enrollment.seatNumber = seatNumber;
-  if (examHall) enrollment.examHall = examHall;
+  if (examHall) enrollment.examHall = examHall._id;
 
   await enrollment.save();
 
