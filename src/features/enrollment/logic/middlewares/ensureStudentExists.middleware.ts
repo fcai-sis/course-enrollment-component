@@ -1,8 +1,8 @@
-import { StudentModel, StudentType } from '@fcai-sis/shared-models';
+import { StudentModel, IStudent } from '@fcai-sis/shared-models';
 import { Request, Response, NextFunction } from 'express';
 import { Document } from 'mongoose';
 
-type MiddlewareRequest = Request<{}, {}, { studentId: string, student: StudentType & Document }>;
+type MiddlewareRequest = Request<{}, {}, { studentId: string, student: IStudent & Document }>;
 
 const ensureStudentExistsMiddleware = async (req: MiddlewareRequest, res: Response, next: NextFunction) => {
   const { studentId } = req.body;
