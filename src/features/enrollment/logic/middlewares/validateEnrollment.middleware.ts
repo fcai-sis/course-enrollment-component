@@ -3,14 +3,14 @@ import { StudentModel } from "@fcai-sis/shared-models";
 import { Request, Response, NextFunction } from "express";
 import { TokenPayload } from "@fcai-sis/shared-middlewares";
 
-import { EnrollmentModel, EnrollmentType } from "../../data/models/enrollment.model";
+import { EnrollmentModel, IEnrollment } from "@fcai-sis/shared-models";
 
 type MiddlewareRequest = Request<
   {},
   {},
   {
-    user: TokenPayload,
-    enrollments: (EnrollmentType & Document)[];
+    user: TokenPayload;
+    enrollments: (IEnrollment & Document)[];
   }
 >;
 
@@ -22,11 +22,16 @@ const validateEnrollmentMiddleware = async (
   const { userId } = req.body.user;
   const student = await StudentModel.findOne({ userId });
 
-  if (!student) return res.status(404).json({ message: "Student not found" });
+  if (!student)
+    return res.status(404).json({
+      error: {
+        message: "Student not found",
+      },
+    });
 
   // Get all enrollments with this student ID
   const existingEnrollments = await EnrollmentModel.find({
-    studentId: student._id
+    studentId: student._id,
   });
 
   // If the enrollment doesn't exist, create a new one
