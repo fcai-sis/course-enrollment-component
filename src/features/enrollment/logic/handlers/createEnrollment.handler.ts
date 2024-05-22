@@ -1,19 +1,16 @@
 import { Request, Response } from "express";
-import { CourseType, StudentType } from "@fcai-sis/shared-models";
-
-import {
-  EnrollmentType,
-  EnrollmentModel,
-} from "../../data/models/enrollment.model";
+import { ICourse, ISemester, IStudent } from "@fcai-sis/shared-models";
+import { EnrollmentModel, IEnrollment } from "@fcai-sis/shared-models";
 import { Document } from "mongoose";
 
 type HandlerRequest = Request<
   {},
   {},
   {
-    enrollments: (EnrollmentType & Document)[];
-    courseToEnrollIn: CourseType & Document;
-    student: StudentType & Document;
+    enrollments: (IEnrollment & Document)[];
+    courseToEnrollIn: ICourse & Document;
+    student: IStudent & Document;
+    semesterId: ISemester & Document;
   }
 >;
 
@@ -21,7 +18,7 @@ type HandlerRequest = Request<
  * Creates a new enrollment for a student in a course
  */
 const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
-  const { enrollments, courseToEnrollIn, student } = req.body;
+  const { enrollments, courseToEnrollIn, student, semesterId } = req.body;
 
   // Get the student's passed courses
   const passedCourses = enrollments
@@ -42,7 +39,6 @@ const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
     }
   }
 
-  console.log("course to enroll in", courseToEnrollIn);
 
   // Check if the student has passed all prerequisites for the course
   const prerequisites = courseToEnrollIn.prerequisites;
@@ -59,8 +55,9 @@ const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
 
   // Create a new enrollment
   const newEnrollment = new EnrollmentModel({
-    studentId: student.studentId,
+    studentId: student,
     courseId: courseToEnrollIn._id,
+    semesterId: semesterId,
   });
 
   await newEnrollment.save();
