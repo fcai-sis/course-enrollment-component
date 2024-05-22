@@ -1,14 +1,12 @@
 import { Request, Response } from "express";
 
-import { IEnrollment, IHall } from "@fcai-sis/shared-models";
+import { EnrollmentModel, IEnrollment, IHall } from "@fcai-sis/shared-models";
 
 /**
  * Update an existing enrollment's course properties (status, seat number, exam hall)
  */
 type HandlerRequest = Request<
-  {
-    studentId: string;
-  },
+  {},
   {},
   {
     enrollment: IEnrollment & Document;
@@ -17,18 +15,23 @@ type HandlerRequest = Request<
     examHall?: IHall & Document;
   }
 >;
-
-// TODO : add middleware
+// TODO: figure out why tf i can't attach the actual enrollment to the request body
 const updateEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
-  const { enrollment } = req.body;
-  const { status, seatNumber, examHall } = req.body;
+  const { status, seatNumber, examHall, enrollment } = req.body;
 
-  // Update the enrollment object
-  if (status) enrollment.status = status;
-  if (seatNumber) enrollment.seatNumber = seatNumber;
-  if (examHall) enrollment.examHall = examHall._id;
+  const updatedEnrollment = await EnrollmentModel.findByIdAndUpdate(
+    enrollment,
+    {
+      ...(status && { status }),
+      ...(seatNumber && { seatNumber }),
+      ...(examHall && { examHall }),
+    },
+    {
+      new: true,
+    }
+  );
 
-  await enrollment.save();
+  await updatedEnrollment.save();
 
   return res.status(200).json({
     message: "Enrollment updated successfully",
