@@ -7,10 +7,10 @@ type HandlerRequest = Request<
   {},
   {},
   {
-    enrollments: (IEnrollment & Document)[];
-    courseToEnrollIn: ICourse & Document;
-    student: IStudent & Document;
-    semesterId: ISemester & Document;
+    enrollments: IEnrollment[];
+    courseToEnrollIn: ICourse;
+    student: IStudent;
+    semesterId: ISemester;
   }
 >;
 
@@ -38,7 +38,6 @@ const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
       });
     }
   }
-
 
   // Check if the student has passed all prerequisites for the course
   const prerequisites = courseToEnrollIn.prerequisites;

@@ -10,7 +10,7 @@ type MiddlewareRequest = Request<
   {},
   {
     user: TokenPayload;
-    enrollments: (IEnrollment & Document)[];
+    enrollments: IEnrollment[];
   }
 >;
 

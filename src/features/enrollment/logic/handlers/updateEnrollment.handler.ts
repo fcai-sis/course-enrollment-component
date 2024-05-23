@@ -9,10 +9,10 @@ type HandlerRequest = Request<
   {},
   {},
   {
-    enrollment: IEnrollment & Document;
+    enrollment: IEnrollment;
     status?: "enrolled" | "passed" | "failed";
     seatNumber?: number;
-    examHall?: IHall & Document;
+    examHall?: IHall;
   }
 >;
 // TODO: figure out why tf i can't attach the actual enrollment to the request body
