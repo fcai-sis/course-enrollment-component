@@ -11,6 +11,7 @@ import validateEnrollmentMiddleware from "./logic/middlewares/validateEnrollment
 import validateCreateEnrollmentRequestMiddleware from "./logic/middlewares/validateCreateEnrollmentRequest.middleware";
 import validateUpdateEnrollmentRequestBodyMiddleware from "./logic/middlewares/updateEnrollmentRequestBody.middleware";
 import adminCreateEnrollmentHandler from "./logic/handlers/adminCreateEnrollment.handler";
+import flushSemesterEnrollmentsHandler from "./logic/handlers/flushSemesterEnrollments.handler";
 
 export default (router: Router) => {
   router.post(
@@ -57,5 +58,12 @@ export default (router: Router) => {
 
     checkRole([Role.EMPLOYEE, Role.ADMIN]),
     asyncHandler(adminCreateEnrollmentHandler)
+  );
+
+  router.delete(
+    "/flush",
+
+    checkRole([Role.EMPLOYEE, Role.ADMIN]),
+    asyncHandler(flushSemesterEnrollmentsHandler)
   );
 };
