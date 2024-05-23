@@ -1,7 +1,12 @@
 import { Request, Response } from "express";
 import { GraduationProjectTeamModel } from "../../data/models/graduationteam.model";
 import mongoose from "mongoose";
-import { EnrollmentType } from "../../../enrollment/data/models/enrollment.model";
+import {
+  IEnrollment,
+  IInstructorTeaching,
+  ISemester,
+  ITaTeaching,
+} from "@fcai-sis/shared-models";
 
 type HandlerRequest = Request<
   {
@@ -9,10 +14,10 @@ type HandlerRequest = Request<
   },
   {},
   {
-    enrollments?: (EnrollmentType & Document)[];
-    instructorTeachings?: mongoose.Schema.Types.ObjectId[];
-    assistantTeachings?: mongoose.Schema.Types.ObjectId[];
-    semester?: mongoose.Schema.Types.ObjectId;
+    enrollments?: IEnrollment[];
+    instructorTeachings?: IInstructorTeaching[];
+    assistantTeachings?: ITaTeaching[];
+    semester?: ISemester;
   }
 >;
 

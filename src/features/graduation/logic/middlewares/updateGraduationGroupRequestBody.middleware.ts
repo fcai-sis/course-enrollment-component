@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import * as validator from "express-validator";
-import { EnrollmentModel } from "features/enrollment/data/models/enrollment.model";
+import {
+  EnrollmentModel,
+  InstructorTeachingModel,
+  TaTeachingModel,
+} from "@fcai-sis/shared-models";
 import GraduationProjectTeamModel from "features/graduation/data/models/graduationteam.model";
 
 const middlewares = [
@@ -58,7 +62,7 @@ const middlewares = [
     .withMessage("Instructor teachings must be an array")
     .custom(async (value) => {
       // Check if the instructor teachings exist in the database
-      const enrollments = await EnrollmentModel.find({
+      const enrollments = await InstructorTeachingModel.find({
         _id: { $in: value },
       });
       if (enrollments.length !== value.length) {
@@ -98,7 +102,7 @@ const middlewares = [
     .withMessage("Assistant teachings must be an array")
     .custom(async (value) => {
       // Check if the assistant teachings exist in the database
-      const enrollments = await EnrollmentModel.find({
+      const enrollments = await TaTeachingModel.find({
         _id: { $in: value },
       });
       if (enrollments.length !== value.length) {
