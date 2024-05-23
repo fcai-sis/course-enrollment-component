@@ -1,7 +1,7 @@
 import * as validator from "express-validator";
 import { Request, Response, NextFunction } from "express";
 import logger from "../../../../core/logger";
-import { EnrollmentModel } from "../../data/models/enrollment.model";
+import { EnrollmentModel } from "@fcai-sis/shared-models";
 
 const ensureEnrollmentExistsMiddleware = [
   validator

@@ -1,40 +1,49 @@
 import { Request, Response } from "express";
-import { EnrollmentModel } from "../../data/models/enrollment.model";
+import { TokenPayload } from "@fcai-sis/shared-middlewares";
+import { StudentModel } from "@fcai-sis/shared-models";
+
+import { EnrollmentModel } from "@fcai-sis/shared-models";
+
+type HandlerRequest = Request<
+  {},
+  {},
+  {
+    user: TokenPayload;
+  }
+>;
 
 /**
  * Fetches all courses that a student is enrolled in
  */
-
-type HandlerRequest = Request<
-  {
-    studentId: string;
-  },
-  {},
-  {}
->;
-
 const handler = async (req: HandlerRequest, res: Response) => {
-  const { studentId } = req.params;
+  const { userId } = req.body.user;
+  const student = await StudentModel.findOne({ userId });
 
-  const enrolledCourses = await EnrollmentModel.find({
-    studentId: studentId,
-  }).populate("courses");
-  if (!enrolledCourses || !enrolledCourses.length) {
-    return res.status(404).json({ message: "No courses found" });
+  if (!student) {
+    return res.status(404).json({
+      message: "Student not found",
+    });
   }
+
+  const studentId = student?._id;
+
+  // Find all enrollments with this student ID
+  const enrolledCourses = await EnrollmentModel.find(
+    { studentId },
+    {
+      __v: 0,
+      _id: 0,
+      studentId: 0,
+    }
+  ).populate({
+    path: "courseId",
+    select: "code -_id",
+  });
 
   const response = {
     studentId,
-    courses: enrolledCourses.map((enrollment) => {
-      return enrollment.courses.map((enrolledCourse: any) => {
-        return {
-          courseCode: enrolledCourse.courseCode,
-          status: enrolledCourse.status,
-          seatNumber: enrolledCourse.seatNumber,
-          examHall: enrolledCourse.examHall,
-        };
-      });
-    }),
+    // Return the enrolled courses (course code, status and seat number and exam hall)
+    courses: enrolledCourses,
   };
 
   return res.status(200).json(response);
