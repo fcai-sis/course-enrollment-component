@@ -56,7 +56,6 @@ export default (router: Router) => {
     "/forceenroll",
 
     checkRole([Role.EMPLOYEE, Role.ADMIN]),
-    validateCreateEnrollmentRequestMiddleware,
     asyncHandler(adminCreateEnrollmentHandler)
   );
 };
