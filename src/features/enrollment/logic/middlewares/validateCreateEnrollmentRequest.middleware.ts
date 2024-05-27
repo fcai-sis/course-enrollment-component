@@ -1,6 +1,6 @@
 import * as validator from "express-validator";
 import { Request, Response, NextFunction } from "express";
-import { CourseModel } from "@fcai-sis/shared-models";
+import { CourseModel, SemesterModel } from "@fcai-sis/shared-models";
 import logger from "../../../../core/logger";
 
 /*
@@ -21,6 +21,28 @@ const validateCreateEnrollmentRequestMiddleware = [
 
       req.body.courseToEnrollIn = course;
 
+      return true;
+    }),
+
+  validator
+    .body("semesterId")
+    .exists()
+    .withMessage("Semester ID is required")
+    .isMongoId()
+    .withMessage("Invalid semester ID")
+    .custom(async (value, { req }) => {
+      // Ensure semester exists
+      const semester = await SemesterModel.findById(value);
+
+      if (!semester) throw new Error("Semester not found");
+
+      // Check if the course is offered in this semester
+      const course = req.body.courseToEnrollIn;
+      if (!semester.courseIds.includes(course._id)) {
+        throw new Error("Course not offered in this semester");
+      }
+
+      req.body.semesterId = semester;
       return true;
     }),
 

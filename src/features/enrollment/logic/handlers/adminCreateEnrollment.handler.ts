@@ -7,7 +7,7 @@ type HandlerRequest = Request<
   {},
   {},
   {
-    courseToEnrollIn: ICourse;
+    courseId: ICourse;
     studentId: IStudent;
     semesterId: ISemester;
   }
@@ -18,24 +18,24 @@ type HandlerRequest = Request<
  */
 
 const handler = async (req: HandlerRequest, res: Response) => {
-  const { courseToEnrollIn, studentId, semesterId } = req.body;
+  const { courseId, studentId, semesterId } = req.body;
 
   // Check if the course is already enrolled in
   const existingEnrollment = await EnrollmentModel.findOne({
     studentId,
-    courseId: courseToEnrollIn._id,
+    courseId: courseId,
     status: { $ne: "failed" },
   });
   if (existingEnrollment) {
     return res.status(400).json({
       message: "Course already enrolled in",
-      course: courseToEnrollIn.code,
+      course: courseId.code,
     });
   }
   // Create a new enrollment
   const newEnrollment = new EnrollmentModel({
     studentId,
-    courseId: courseToEnrollIn._id,
+    courseId: courseId,
     semesterId,
   });
 

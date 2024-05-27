@@ -1,5 +1,4 @@
-import { Document } from "mongoose";
-import { StudentModel } from "@fcai-sis/shared-models";
+import { IStudent, StudentModel } from "@fcai-sis/shared-models";
 import { Request, Response, NextFunction } from "express";
 import { TokenPayload } from "@fcai-sis/shared-middlewares";
 
@@ -11,6 +10,7 @@ type MiddlewareRequest = Request<
   {
     user: TokenPayload;
     enrollments: IEnrollment[];
+    student: IStudent;
   }
 >;
 
@@ -28,6 +28,8 @@ const validateEnrollmentMiddleware = async (
         message: "Student not found",
       },
     });
+
+  req.body.student = student;
 
   // Get all enrollments with this student ID
   const existingEnrollments = await EnrollmentModel.find({
