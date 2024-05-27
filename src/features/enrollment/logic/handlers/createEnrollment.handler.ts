@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { ICourse, ISemester, IStudent } from "@fcai-sis/shared-models";
 import { EnrollmentModel, IEnrollment } from "@fcai-sis/shared-models";
-import { Document } from "mongoose";
 
 type HandlerRequest = Request<
   {},
