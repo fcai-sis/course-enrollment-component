@@ -6,7 +6,7 @@ import {
 import { Request, Response, NextFunction } from "express";
 import * as validator from "express-validator";
 import { EnrollmentModel } from "@fcai-sis/shared-models";
-import GraduationProjectTeamModel from "features/graduation/data/models/graduationteam.model";
+import GraduationProjectTeamModel from "../../../graduation/data/models/graduationteam.model";
 
 const middlewares = [
   validator
@@ -38,7 +38,7 @@ const middlewares = [
       }
       return true;
     })
-    .custom(async (value) => {
+    .custom(async (value, { req }) => {
       // Check if the enrollments exist in the database
       const enrollments = await EnrollmentModel.find({
         _id: { $in: value },
@@ -46,16 +46,17 @@ const middlewares = [
       if (enrollments.length !== value.length) {
         throw new Error("Some enrollments do not exist");
       }
-      return true;
-    })
-    .custom((value, { req }) => {
+
       // Check if the enrollments belong to the semester value of the request body
       const semesterId = req.body.semester;
-      for (const enrollment of value) {
+
+      for (const enrollment of enrollments) {
         if (enrollment.semesterId.toString() !== semesterId) {
           throw new Error("All enrollments must belong to the same semester");
         }
       }
+
+      return true;
     })
     .custom(async (value) => {
       // Check if the enrollments are not already in a graduation project group
@@ -77,7 +78,7 @@ const middlewares = [
     .withMessage("Instructor teachings are required")
     .isArray()
     .withMessage("Instructor teachings must be an array")
-    .custom(async (value) => {
+    .custom(async (value, { req }) => {
       // Check if the instructor teachings exist in the database
       const enrollments = await InstructorTeachingModel.find({
         _id: { $in: value },
@@ -85,18 +86,18 @@ const middlewares = [
       if (enrollments.length !== value.length) {
         throw new Error("Some instructor teachings do not exist");
       }
-      return true;
-    })
-    .custom((value, { req }) => {
-      // Check if the instructor teachings belong to the semester value of the request body
+
       const semesterId = req.body.semester;
-      for (const instructorTeaching of value) {
+
+      for (const instructorTeaching of enrollments) {
         if (instructorTeaching.semesterId.toString() !== semesterId) {
           throw new Error(
             "All instructor teachings must belong to the same semester"
           );
         }
       }
+
+      return true;
     }),
 
   validator
@@ -105,7 +106,7 @@ const middlewares = [
     .withMessage("Assistant teachings are required")
     .isArray()
     .withMessage("Assistant teachings must be an array")
-    .custom(async (value) => {
+    .custom(async (value, { req }) => {
       // Check if the assistant teachings exist in the database
       const enrollments = await TaTeachingModel.find({
         _id: { $in: value },
@@ -113,18 +114,18 @@ const middlewares = [
       if (enrollments.length !== value.length) {
         throw new Error("Some assistant teachings do not exist");
       }
-      return true;
-    })
-    .custom((value, { req }) => {
-      // Check if the assistant teachings belong to the semester value of the request body
+
       const semesterId = req.body.semester;
-      for (const assistantTeaching of value) {
+
+      for (const assistantTeaching of enrollments) {
         if (assistantTeaching.semesterId.toString() !== semesterId) {
           throw new Error(
             "All assistant teachings must belong to the same semester"
           );
         }
       }
+
+      return true;
     }),
 
   (req: Request, res: Response, next: NextFunction) => {
@@ -137,8 +138,6 @@ const middlewares = [
         },
       });
     }
-
-    req.body.groupCode = req.body.groupCode.trim();
 
     next();
   },
