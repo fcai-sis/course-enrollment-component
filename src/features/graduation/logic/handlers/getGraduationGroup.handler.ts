@@ -15,7 +15,7 @@ type HandlerRequest = Request<
 const handler = async (req: HandlerRequest, res: Response) => {
   const { groupId } = req.params;
 
-  const graduationGroup = await GraduationProjectTeamModel.findOne({ groupId });
+  const graduationGroup = await GraduationProjectTeamModel.findById(groupId);
 
   if (!graduationGroup) {
     return res.status(404).json({
@@ -26,6 +26,6 @@ const handler = async (req: HandlerRequest, res: Response) => {
   return res.status(200).json(graduationGroup);
 };
 
-const getGraduationGroupHandler = handler;
+const getGraduationGroupByIdHandler = handler;
 
-export default getGraduationGroupHandler;
+export default getGraduationGroupByIdHandler;
