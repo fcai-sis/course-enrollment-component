@@ -6,9 +6,14 @@ import ensureGroupIdInParamsMiddleware from "./logic/middlewares/ensureGroupIdIn
 import updateGraduationGroupHandler from "./logic/handlers/updateGraduationGroup.handler";
 import updateGraduationGroupRequestBodyMiddleware from "./logic/middlewares/updateGraduationGroupRequestBody.middleware";
 import createGraduationGroupRequestBodyMiddleware from "./logic/middlewares/createGraduationGroupRequestBody.middleware";
-import { paginationQueryParamsMiddleware } from "@fcai-sis/shared-middlewares";
+import {
+  Role,
+  checkRole,
+  paginationQueryParamsMiddleware,
+} from "@fcai-sis/shared-middlewares";
 import getAllGraduationGroupsHandler from "./logic/handlers/getAllGraduationGroups.handler";
 import deleteGraduationGroupHandler from "./logic/handlers/deleteGraduationGroup.handler";
+import getMyGraduationGroupHandler from "./logic/handlers/getMyGraduationGroup.handler";
 
 const graduationGroupRoutes = (router: Router) => {
   /**
@@ -17,6 +22,7 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.post(
     "/create",
+    checkRole([Role.STUDENT, Role.INSTUCTOR]),
     createGraduationGroupRequestBodyMiddleware,
     asyncHandler(CreateGraduationGroupHandler)
   );
@@ -27,9 +33,20 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.patch(
     "/update/:groupId",
+    checkRole([Role.INSTUCTOR, Role.EMPLOYEE, Role.ADMIN]),
     ensureGroupIdInParamsMiddleware,
     updateGraduationGroupRequestBodyMiddleware,
     asyncHandler(updateGraduationGroupHandler)
+  );
+
+  /**
+   * Get the authenticated student's graduation group
+   */
+
+  router.get(
+    "/mygroup",
+    checkRole([Role.STUDENT]),
+    asyncHandler(getMyGraduationGroupHandler)
   );
 
   /**
@@ -37,6 +54,7 @@ const graduationGroupRoutes = (router: Router) => {
    */
   router.get(
     "/:groupId",
+    checkRole([Role.INSTUCTOR, Role.EMPLOYEE, Role.ADMIN]),
     ensureGroupIdInParamsMiddleware,
     asyncHandler(getGraduationGroupByIdHandler)
   );
@@ -47,12 +65,14 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.get(
     "/",
+    checkRole([Role.INSTUCTOR, Role.EMPLOYEE, Role.ADMIN]),
     paginationQueryParamsMiddleware,
     asyncHandler(getAllGraduationGroupsHandler)
   );
 
   router.delete(
     "/:groupId",
+    checkRole([Role.EMPLOYEE, Role.ADMIN]),
     ensureGroupIdInParamsMiddleware,
     asyncHandler(deleteGraduationGroupHandler)
   );
