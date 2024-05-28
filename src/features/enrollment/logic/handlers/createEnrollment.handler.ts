@@ -28,7 +28,7 @@ const createEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
   for (const enrollment of enrollments) {
     // If the course does exist, and its status is either enrolled or passed (i.e. not failed), return an error
     if (
-      enrollment.courseId.toString() === courseToEnrollIn._id.toString() &&
+      enrollment.courseId.toString() === courseToEnrollIn._id?.toString() && // TODO: why do i need to use ? here
       enrollment.status !== "failed"
     ) {
       return res.status(400).json({
