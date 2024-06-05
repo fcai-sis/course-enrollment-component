@@ -12,6 +12,8 @@ import validateCreateEnrollmentRequestMiddleware from "./logic/middlewares/valid
 import validateUpdateEnrollmentRequestBodyMiddleware from "./logic/middlewares/updateEnrollmentRequestBody.middleware";
 import adminCreateEnrollmentHandler from "./logic/handlers/adminCreateEnrollment.handler";
 import flushSemesterEnrollmentsHandler from "./logic/handlers/flushSemesterEnrollments.handler";
+import createMultiEnrollmentHandler from "./logic/handlers/createMultiEnrollment.handler";
+import validateCreateMultiEnrollmentRequestMiddleware from "./logic/middlewares/validateCreateMultiEnrollment.middleware";
 
 export default (router: Router) => {
   router.post(
@@ -25,6 +27,19 @@ export default (router: Router) => {
     validateEnrollmentMiddleware,
 
     asyncHandler(createEnrollmentHandler)
+  );
+
+  router.post(
+    "/multicreate",
+
+    // Ensure the user is a student
+    checkRole([Role.STUDENT]),
+
+    validateCreateMultiEnrollmentRequestMiddleware,
+
+    validateEnrollmentMiddleware,
+
+    asyncHandler(createMultiEnrollmentHandler)
   );
 
   router.get(
