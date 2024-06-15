@@ -31,7 +31,7 @@ const gradeRoutes = (router: Router) => {
 
   router.patch(
     "/updatefinal/:enrollmentId",
-    // checkRole([Role.INSTUCTOR, Role.ADMIN]),
+    checkRole([Role.INSTUCTOR, Role.ADMIN]),
     ensureEnrollmentIdInParamsMiddleware,
     updateFinalExamMiddleware,
     asyncHandler(updateFinalExamScoreHandler)
