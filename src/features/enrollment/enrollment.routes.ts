@@ -1,42 +1,84 @@
 import { Router } from "express";
-
 import { asyncHandler } from "@fcai-sis/shared-utilities";
+import { Role, checkRole } from "@fcai-sis/shared-middlewares";
+
+import updateEnrollmentHandler from "./logic/handlers/updateEnrollment.handler";
 import createEnrollmentHandler from "./logic/handlers/createEnrollment.handler";
+import fetchEnrolledCourses from "./logic/handlers/fetchEnrolledCourses.handler";
 import fetchEligibleCourses from "./logic/handlers/fetchEligibleCourses.handler";
 import getPassedCoursesMiddleware from "./logic/middlewares/getPassedCourses.middleware";
 import validateEnrollmentMiddleware from "./logic/middlewares/validateEnrollment.middleware";
 import validateCreateEnrollmentRequestMiddleware from "./logic/middlewares/validateCreateEnrollmentRequest.middleware";
-import fetchEnrolledCourses from "./logic/handlers/fetchEnrolledCourses.handler";
-import updateEnrollmentHandler from "./logic/handlers/updateEnrollment.handler";
+import validateUpdateEnrollmentRequestBodyMiddleware from "./logic/middlewares/updateEnrollmentRequestBody.middleware";
 import adminCreateEnrollmentHandler from "./logic/handlers/adminCreateEnrollment.handler";
-import ensureEnrollmentExistsMiddleware from "./logic/middlewares/ensureEnrollmentExists.middleware";
+import flushSemesterEnrollmentsHandler from "./logic/handlers/flushSemesterEnrollments.handler";
+import createMultiEnrollmentHandler from "./logic/handlers/createMultiEnrollment.handler";
+import validateCreateMultiEnrollmentRequestMiddleware from "./logic/middlewares/validateCreateMultiEnrollment.middleware";
 
 export default (router: Router) => {
   router.post(
     "/create",
+
+    // Ensure the user is a student
+    checkRole([Role.STUDENT]),
+
     validateCreateEnrollmentRequestMiddleware,
+
     validateEnrollmentMiddleware,
+
     asyncHandler(createEnrollmentHandler)
   );
 
   router.post(
-    "/admin/create",
-    validateCreateEnrollmentRequestMiddleware,
+    "/multicreate",
+
+    // Ensure the user is a student
+    checkRole([Role.STUDENT]),
+
+    validateCreateMultiEnrollmentRequestMiddleware,
+
     validateEnrollmentMiddleware,
-    asyncHandler(adminCreateEnrollmentHandler)
+
+    asyncHandler(createMultiEnrollmentHandler)
   );
 
   router.get(
-    "/courses/:studentId",
+    "/courses",
+
+    checkRole([Role.STUDENT]),
+
     getPassedCoursesMiddleware,
+
     asyncHandler(fetchEligibleCourses)
   );
 
-  router.get("/enrolled/:studentId", asyncHandler(fetchEnrolledCourses));
+  router.get(
+    "/enrolled",
+
+    checkRole([Role.STUDENT]),
+
+    asyncHandler(fetchEnrolledCourses)
+  );
 
   router.patch(
-    "/update/",
-    ensureEnrollmentExistsMiddleware,
+    "/update",
+
+    checkRole([Role.EMPLOYEE, Role.ADMIN]),
+    validateUpdateEnrollmentRequestBodyMiddleware,
     asyncHandler(updateEnrollmentHandler)
+  );
+
+  router.post(
+    "/forceenroll",
+
+    checkRole([Role.EMPLOYEE, Role.ADMIN]),
+    asyncHandler(adminCreateEnrollmentHandler)
+  );
+
+  router.delete(
+    "/flush",
+
+    checkRole([Role.EMPLOYEE, Role.ADMIN]),
+    asyncHandler(flushSemesterEnrollmentsHandler)
   );
 };

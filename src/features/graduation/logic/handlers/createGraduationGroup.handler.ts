@@ -1,0 +1,46 @@
+import { Request, Response } from "express";
+import GraduationProjectTeamModel from "../../data/models/graduationteam.model";
+import {
+  IEnrollment,
+  IInstructorTeaching,
+  ISemester,
+  ITaTeaching,
+} from "@fcai-sis/shared-models";
+
+type HandlerRequest = Request<
+  {},
+  {},
+  {
+    enrollments: IEnrollment[];
+    instructorTeachings: IInstructorTeaching[];
+    assistantTeachings: ITaTeaching[];
+    semester: ISemester;
+  }
+>;
+
+/*
+ * Creates a graduation project group.
+ * */
+const handler = async (req: HandlerRequest, res: Response) => {
+  const { enrollments, instructorTeachings, assistantTeachings, semester } =
+    req.body;
+
+  const graduationProject = new GraduationProjectTeamModel({
+    enrollments,
+    instructorTeachings,
+    assistantTeachings,
+    semester,
+  });
+
+  await graduationProject.save();
+
+  const response = {
+    message: "Graduation project group created successfully",
+    graduationProject,
+  };
+
+  return res.status(201).json(response);
+};
+
+const CreateGraduationGroupHandler = handler;
+export default CreateGraduationGroupHandler;

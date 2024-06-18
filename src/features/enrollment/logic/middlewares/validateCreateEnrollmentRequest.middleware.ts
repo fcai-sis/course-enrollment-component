@@ -1,64 +1,48 @@
 import * as validator from "express-validator";
 import { Request, Response, NextFunction } from "express";
-import { CourseModel, StudentModel } from "@fcai-sis/shared-models";
+import { CourseModel, SemesterModel } from "@fcai-sis/shared-models";
 import logger from "../../../../core/logger";
 
+/*
+ * Middleware to validate the request body for creating an enrollment
+ *
+ * Attaches the student and course to enroll in to the request body
+ **/
 const validateCreateEnrollmentRequestMiddleware = [
   validator
-    .body("studentId")
+    .body("courseCode")
     .exists()
-    .withMessage("Student ID is required")
-    .isMongoId()
-    .withMessage("Invalid student ID")
+    .withMessage("Course code is required")
     .custom(async (value, { req }) => {
-      // Fetch the student
-      const student = await StudentModel.findById(value);
-
-      if (!student) {
-        throw new Error("Student not found");
-      }
-
-      req.body.student = student;
-
-      return true;
-    }),
-
-  validator
-    .body("courses")
-    .exists()
-    .withMessage("Courses to enroll in is required")
-    .isArray()
-    .withMessage("At least one course is required")
-    .custom((_, { req }) => {
-      req.body.coursesToEnrollIn = [];
-
-      return true;
-    }),
-
-  validator
-    .body("courses.*")
-    .custom((value) => {
-      // Course code must follow this pattern: 2-4 uppercase letters followed by 3 digits
-      const pattern = /^[A-Z]{2,4}\d{3}$/;
-      if (!pattern.test(value)) {
-        throw new Error(
-          "Invalid course code, must be 2-4 uppercase letters followed by 3 digits"
-        );
-      }
-
-      return true;
-    })
-    .withMessage("Invalid course code")
-    .custom(async (value, { req }) => {
-      // Fetch the course
+      // Ensure course exists
       const course = await CourseModel.findOne({ code: value });
 
-      if (!course) {
-        throw new Error("Course not found");
+      if (!course) throw new Error("Course not found");
+
+      req.body.courseToEnrollIn = course;
+
+      return true;
+    }),
+
+  validator
+    .body("semesterId")
+    .exists()
+    .withMessage("Semester ID is required")
+    .isMongoId()
+    .withMessage("Invalid semester ID")
+    .custom(async (value, { req }) => {
+      // Ensure semester exists
+      const semester = await SemesterModel.findById(value);
+
+      if (!semester) throw new Error("Semester not found");
+
+      // Check if the course is offered in this semester
+      const course = req.body.courseToEnrollIn;
+      if (!semester.courseIds.includes(course._id)) {
+        throw new Error("Course not offered in this semester");
       }
 
-      req.body.coursesToEnrollIn.push(course);
-
+      req.body.semesterId = semester;
       return true;
     }),
 

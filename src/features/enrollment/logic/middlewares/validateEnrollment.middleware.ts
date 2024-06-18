@@ -1,42 +1,47 @@
-import { Document } from "mongoose";
+import { IStudent, StudentModel } from "@fcai-sis/shared-models";
 import { Request, Response, NextFunction } from "express";
-import { CourseType, StudentType } from "@fcai-sis/shared-models";
+import { TokenPayload } from "@fcai-sis/shared-middlewares";
 
-import {
-  EnrollmentModel,
-  EnrollmentType,
-} from "../../data/models/enrollment.model";
+import { EnrollmentModel, IEnrollment } from "@fcai-sis/shared-models";
 
 type MiddlewareRequest = Request<
   {},
   {},
   {
-    studentId: string;
-    enrollment: EnrollmentType & Document;
-    coursesToEnrollIn: (CourseType & Document)[];
-    student: StudentType & Document;
+    user: TokenPayload;
+    enrollments: IEnrollment[];
+    student: IStudent;
   }
 >;
 
 const validateEnrollmentMiddleware = async (
   req: MiddlewareRequest,
-  _: Response,
+  res: Response,
   next: NextFunction
 ) => {
-  const { studentId } = req.body;
+  const { userId } = req.body.user;
+  const student = await StudentModel.findOne({ userId });
 
-  // Get the student's enrollment object if it exists
-  const existingEnrollment = await EnrollmentModel.findOne({ studentId });
+  if (!student)
+    return res.status(404).json({
+      error: {
+        message: "Student not found",
+      },
+    });
+
+  req.body.student = student;
+
+  // Get all enrollments with this student ID
+  const existingEnrollments = await EnrollmentModel.find({
+    studentId: student._id,
+  });
 
   // If the enrollment doesn't exist, create a new one
-  // Otherwise, add the new courses to the existing enrollment
-  if (!existingEnrollment) {
-    req.body.enrollment = await EnrollmentModel.create({
-      studentId,
-      courses: [],
-    });
+  // Otherwise, add the new course to the existing enrollment
+  if (existingEnrollments.length === 0) {
+    req.body.enrollments = [];
   } else {
-    req.body.enrollment = existingEnrollment;
+    req.body.enrollments = existingEnrollments;
   }
 
   next();
