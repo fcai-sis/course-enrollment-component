@@ -3,6 +3,7 @@ import { Router } from "express";
 import enrollmentRoutes from "./features/enrollment/enrollment.routes";
 import graduationGroupRoutes from "./features/graduation/graduationgroup.routes";
 import gradeRoutes from "./features/grades/logic/grade.routes";
+import bylawRoutes from "./features/bylaw/bylaw.routes";
 
 export const enrollmentRouter = () => {
   const router = Router();
@@ -21,3 +22,9 @@ export const gradeRouter = () => {
   gradeRoutes(router);
   return router;
 };
+
+export const bylawRouter = () => {
+  const router = Router();
+  bylawRoutes(router);
+  return router;
+}
