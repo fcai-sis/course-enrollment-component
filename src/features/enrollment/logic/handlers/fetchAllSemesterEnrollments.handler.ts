@@ -34,7 +34,9 @@ const handler = async (req: HandlerRequest, res: Response) => {
   const enrollments = await EnrollmentModel.find({
     semesterId: semesterId,
     courseId: courseId,
-  });
+  })
+    .populate("studentId", "studentId")
+    .sort({ "studentId.studentId": "asc" });
 
   if (enrollments.length === 0) {
     return res.status(404).json({
