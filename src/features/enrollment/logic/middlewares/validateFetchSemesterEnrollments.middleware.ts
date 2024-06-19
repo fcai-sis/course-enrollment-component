@@ -5,9 +5,7 @@ import * as validator from "express-validator";
 const middlewares = [
   validator
     .body("semesterId")
-
-    .exists()
-    .withMessage("Semester ID is required")
+    .optional()
 
     .isMongoId()
     .withMessage("Semester ID must be a valid Mongo ID")
