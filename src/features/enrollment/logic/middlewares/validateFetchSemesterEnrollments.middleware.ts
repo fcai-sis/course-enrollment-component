@@ -21,7 +21,7 @@ const middlewares = [
     }),
 
   validator
-    .body("courseId")
+    .param("courseId")
 
     .exists()
     .withMessage("Course ID is required")
@@ -50,7 +50,8 @@ const middlewares = [
       });
     }
 
-    req.params.semesterId = req.params.semesterId.trim();
+    if (req.body.semesterId) req.body.semesterId = req.body.semesterId.trim();
+    req.body.courseId = req.params.courseId.trim();
 
     next();
   },
