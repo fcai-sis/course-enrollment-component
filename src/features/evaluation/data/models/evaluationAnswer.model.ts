@@ -1,6 +1,6 @@
 import mongoose, { InferSchemaType, Schema } from "mongoose";
 import { evaluationQuestionModelName } from "./evaluationQuestion.model";
-import { enrollmentModelName } from "../../../enrollment/data/models/enrollment.model";
+import { enrollmentModelName } from "@fcai-sis/shared-models";
 import { ForeignKeyNotFound } from "../../../utils/customError.exception";
 
 
