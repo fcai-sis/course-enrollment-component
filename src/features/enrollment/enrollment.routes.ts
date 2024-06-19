@@ -14,6 +14,8 @@ import adminCreateEnrollmentHandler from "./logic/handlers/adminCreateEnrollment
 import flushSemesterEnrollmentsHandler from "./logic/handlers/flushSemesterEnrollments.handler";
 import createMultiEnrollmentHandler from "./logic/handlers/createMultiEnrollment.handler";
 import validateCreateMultiEnrollmentRequestMiddleware from "./logic/middlewares/validateCreateMultiEnrollment.middleware";
+import ensureSemesterIdInParamsMiddleware from "./logic/middlewares/ensureSemesterIdInParams.middleware";
+import fetchAllSemesterEnrollmentsHandler from "./logic/handlers/fetchAllSemesterEnrollments.handler";
 
 export default (router: Router) => {
   router.post(
@@ -80,5 +82,12 @@ export default (router: Router) => {
 
     checkRole([Role.EMPLOYEE, Role.ADMIN]),
     asyncHandler(flushSemesterEnrollmentsHandler)
+  );
+
+  router.get(
+    "/:semesterId",
+    checkRole([Role.EMPLOYEE, Role.ADMIN]),
+    ensureSemesterIdInParamsMiddleware,
+    asyncHandler(fetchAllSemesterEnrollmentsHandler)
   );
 };
