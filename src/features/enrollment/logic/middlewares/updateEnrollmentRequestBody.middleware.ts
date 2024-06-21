@@ -5,7 +5,6 @@ import { validateRequestMiddleware } from "@fcai-sis/shared-middlewares";
 /*
  * Middleware to validate the request body for updating an enrollment
  *
- * Attaches the enrollment and exam hall (if it exists) to the request body
  **/
 const validateUpdateEnrollmentRequestBodyMiddleware = [
   validator

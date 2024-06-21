@@ -1,12 +1,10 @@
 import { Router } from "express";
 import { asyncHandler } from "@fcai-sis/shared-utilities";
 import { Role, checkRole } from "@fcai-sis/shared-middlewares";
-
 import updateEnrollmentHandler from "./logic/handlers/updateEnrollment.handler";
 import fetchEnrolledCourses from "./logic/handlers/fetchEnrolledCourses.handler";
 import fetchEligibleCourses from "./logic/handlers/fetchEligibleCourses.handler";
 import getPassedCoursesMiddleware from "./logic/middlewares/getPassedCourses.middleware";
-import adminCreateEnrollmentHandler from "./logic/handlers/adminCreateEnrollment.handler";
 import flushSemesterEnrollmentsHandler from "./logic/handlers/flushSemesterEnrollments.handler";
 import enrollInCoursesHandler from "./logic/handlers/enrollInCourses.handler";
 import validateFetchSemesterEnrollmentsMiddleware from "./logic/middlewares/validateFetchSemesterEnrollments.middleware";
@@ -28,7 +26,7 @@ export default (router: Router) => {
 
   // Fetch eligible courses for a student
   router.get(
-    "/courses",
+    "/eligible",
     checkRole([Role.STUDENT]),
     getPassedCoursesMiddleware,
     asyncHandler(fetchEligibleCourses)
@@ -54,13 +52,6 @@ export default (router: Router) => {
     checkRole([Role.EMPLOYEE, Role.ADMIN]),
     validateUpdateEnrollmentRequestBodyMiddleware,
     asyncHandler(updateEnrollmentHandler)
-  );
-
-  router.post(
-    "/forceenroll",
-
-    checkRole([Role.EMPLOYEE, Role.ADMIN]),
-    asyncHandler(adminCreateEnrollmentHandler)
   );
 
   router.delete(
