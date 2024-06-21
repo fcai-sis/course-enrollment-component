@@ -1,4 +1,4 @@
-import { StudentModel } from "@fcai-sis/shared-models";
+import { EnrollmentStatusEnum, StudentModel } from "@fcai-sis/shared-models";
 import { Request, Response, NextFunction } from "express";
 
 import { EnrollmentModel } from "@fcai-sis/shared-models";
@@ -10,7 +10,7 @@ const getPassedCoursesMiddleware = async (
   next: NextFunction
 ) => {
   const { userId } = req.body.user;
-  const student = await StudentModel.findOne({ userId });
+  const student = await StudentModel.findOne({ user: userId });
 
   if (!student)
     return res.status(404).json({
@@ -24,19 +24,19 @@ const getPassedCoursesMiddleware = async (
 
   // Get all enrollments with this student ID that have the course status marked as "passed"
   const enrollments = await EnrollmentModel.find({
-    studentId,
-    status: "passed",
-  });
+    student: studentId,
+    status: EnrollmentStatusEnum[1],
+  }).populate("course");
 
   // Append the course ID to the passedCourses array
-  enrollments.forEach((enrollment) => {
-    passedCourses.push(enrollment.courseId);
-  });
+  // enrollments.forEach((enrollment) => {
+  //   passedCourses.push(enrollment.courseId);
+  // });
 
   // Add the passed courses to the request body
   req.body = {
     ...req.body,
-    passedCourses,
+    passedCourses: enrollments.map((enrollment) => enrollment.course),
   };
 
   next();

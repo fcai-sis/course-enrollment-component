@@ -12,26 +12,25 @@ const gradeRoutes = (router: Router) => {
   /**
    * Add new scores to an existing grade
    */
-
   router.patch(
-    "/addscore/:enrollmentId",
-    checkRole([Role.INSTUCTOR, Role.ADMIN]),
+    "/addScore/:enrollmentId",
+    checkRole([Role.INSTUCTOR, Role.TEACHING_ASSISTANT]),
     ensureEnrollmentIdInParamsMiddleware,
     addScoreRequestMiddleware,
     asyncHandler(addScoreHandler)
   );
 
   router.patch(
-    "/updatescore/:enrollmentId",
-    checkRole([Role.INSTUCTOR, Role.ADMIN]),
+    "/updateScore/:enrollmentId",
+    checkRole([Role.INSTUCTOR, Role.TEACHING_ASSISTANT]),
     ensureEnrollmentIdInParamsMiddleware,
     addScoreRequestMiddleware,
     asyncHandler(updateScoreHandler)
   );
 
   router.patch(
-    "/updatefinal/:enrollmentId",
-    checkRole([Role.INSTUCTOR, Role.ADMIN]),
+    "/updateFinal/:enrollmentId",
+    checkRole([Role.INSTUCTOR]),
     ensureEnrollmentIdInParamsMiddleware,
     updateFinalExamMiddleware,
     asyncHandler(updateFinalExamScoreHandler)
