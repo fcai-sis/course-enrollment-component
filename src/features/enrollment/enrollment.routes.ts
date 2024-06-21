@@ -14,6 +14,8 @@ import validateFetchSemesterEnrollmentsMiddleware from "./logic/middlewares/vali
 import fetchAllSemesterEnrollmentsHandler from "./logic/handlers/fetchAllSemesterEnrollments.handler";
 import fetchStudentCoursesHandler from "./logic/handlers/fetchStudentCourses.handler";
 import validateEnrollInCoursesRequestMiddleware from "./logic/middlewares/validateEnrollIntoCourses.middleware";
+import assignHallsHandler from "./logic/handlers/assignHalls.handler";
+import validateAssignHallRequestMiddleware from "./logic/middlewares/assignHallRequest.middleware";
 
 export default (router: Router) => {
   // Enroll in courses
@@ -73,5 +75,11 @@ export default (router: Router) => {
     checkRole([Role.EMPLOYEE, Role.ADMIN]),
     validateFetchSemesterEnrollmentsMiddleware,
     asyncHandler(fetchAllSemesterEnrollmentsHandler)
+  );
+  router.patch(
+    "/assign-hall",
+    checkRole([Role.EMPLOYEE, Role.ADMIN]),
+    validateAssignHallRequestMiddleware,
+    asyncHandler(assignHallsHandler)
   );
 };
