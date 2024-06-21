@@ -7,7 +7,7 @@ import ensureEvaluationQuestionIdInParamsMiddleware from "./evaluationQuestion-l
 import deleteEvaluationQuestionHandler from "./evaluationQuestion-logic/handlers/deleteEvaluationQuestion.handler";
 import validateTypeFieldMiddleware from "./evaluationQuestion-logic/middlewares/validateTypeField.middleware";
 import getEvaluationQuestionsHandler from "./evaluationQuestion-logic/handlers/getEvaluationQuestions.handler";
-import { paginationQueryParamsMiddleware } from "@fcai-sis/shared-middlewares";
+// import { paginationQueryParamsMiddleware } from "@fcai-sis/shared-middlewares";
 import updateEvaluationQuestionValidatorMiddleware from "./evaluationQuestion-logic/middlewares/updateEvaluationQuestionValidator.middleware";
 import updateEvaluationQuestionHandler from "./evaluationQuestion-logic/handlers/updateEvaluationQuestion.handler";
 
@@ -40,7 +40,7 @@ const evaluationRoutes = (router: Router) => {
     "/questions/read",
 
     validateTypeFieldMiddleware,
-    paginationQueryParamsMiddleware,
+    // paginationQueryParamsMiddleware,
 
     asyncHandler(getEvaluationQuestionsHandler)
   )

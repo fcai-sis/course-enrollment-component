@@ -3,10 +3,10 @@ import {
   SemesterModel,
   TaTeachingModel,
 } from "@fcai-sis/shared-models";
-import { Request, Response, NextFunction } from "express";
 import * as validator from "express-validator";
 import { EnrollmentModel } from "@fcai-sis/shared-models";
 import GraduationProjectTeamModel from "../../../graduation/data/models/graduationteam.model";
+import { validateRequestMiddleware } from "@fcai-sis/shared-middlewares";
 
 const middlewares = [
   validator
@@ -42,7 +42,7 @@ const middlewares = [
       // Check if the enrollments exist in the database
       const enrollments = await EnrollmentModel.find({
         _id: { $in: value },
-      });
+      }).populate("semester");
       if (enrollments.length !== value.length) {
         throw new Error("Some enrollments do not exist");
       }
@@ -51,7 +51,7 @@ const middlewares = [
       const semesterId = req.body.semester;
 
       for (const enrollment of enrollments) {
-        if (enrollment.semesterId.toString() !== semesterId) {
+        if (enrollment.semester._id.toString() !== semesterId) {
           throw new Error("All enrollments must belong to the same semester");
         }
       }
@@ -82,7 +82,7 @@ const middlewares = [
       // Check if the instructor teachings exist in the database
       const enrollments = await InstructorTeachingModel.find({
         _id: { $in: value },
-      });
+      }).populate("semester");
       if (enrollments.length !== value.length) {
         throw new Error("Some instructor teachings do not exist");
       }
@@ -90,7 +90,7 @@ const middlewares = [
       const semesterId = req.body.semester;
 
       for (const instructorTeaching of enrollments) {
-        if (instructorTeaching.semesterId.toString() !== semesterId) {
+        if (instructorTeaching.semester._id.toString() !== semesterId) {
           throw new Error(
             "All instructor teachings must belong to the same semester"
           );
@@ -110,7 +110,7 @@ const middlewares = [
       // Check if the assistant teachings exist in the database
       const enrollments = await TaTeachingModel.find({
         _id: { $in: value },
-      });
+      }).populate("semester");
       if (enrollments.length !== value.length) {
         throw new Error("Some assistant teachings do not exist");
       }
@@ -118,7 +118,7 @@ const middlewares = [
       const semesterId = req.body.semester;
 
       for (const assistantTeaching of enrollments) {
-        if (assistantTeaching.semesterId.toString() !== semesterId) {
+        if (assistantTeaching.semester._id.toString() !== semesterId) {
           throw new Error(
             "All assistant teachings must belong to the same semester"
           );
@@ -128,19 +128,7 @@ const middlewares = [
       return true;
     }),
 
-  (req: Request, res: Response, next: NextFunction) => {
-    const errors = validator.validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        error: {
-          message: errors.array()[0].msg,
-        },
-      });
-    }
-
-    next();
-  },
+  validateRequestMiddleware,
 ];
 
 const createGraduationGroupRequestBodyMiddleware = middlewares;

@@ -19,7 +19,9 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
   if (!graduationGroup) {
     return res.status(404).json({
-      message: "Graduation group not found",
+      error: {
+        message: "Graduation group not found",
+      },
     });
   }
 

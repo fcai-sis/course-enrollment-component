@@ -6,14 +6,11 @@ import ensureGroupIdInParamsMiddleware from "./logic/middlewares/ensureGroupIdIn
 import updateGraduationGroupHandler from "./logic/handlers/updateGraduationGroup.handler";
 import updateGraduationGroupRequestBodyMiddleware from "./logic/middlewares/updateGraduationGroupRequestBody.middleware";
 import createGraduationGroupRequestBodyMiddleware from "./logic/middlewares/createGraduationGroupRequestBody.middleware";
-import {
-  Role,
-  checkRole,
-  paginationQueryParamsMiddleware,
-} from "@fcai-sis/shared-middlewares";
+import { Role, checkRole } from "@fcai-sis/shared-middlewares";
 import getAllGraduationGroupsHandler from "./logic/handlers/getAllGraduationGroups.handler";
 import deleteGraduationGroupHandler from "./logic/handlers/deleteGraduationGroup.handler";
 import getMyGraduationGroupHandler from "./logic/handlers/getMyGraduationGroup.handler";
+import paginate from "express-paginate";
 
 const graduationGroupRoutes = (router: Router) => {
   /**
@@ -66,7 +63,7 @@ const graduationGroupRoutes = (router: Router) => {
   router.get(
     "/",
     checkRole([Role.INSTUCTOR, Role.EMPLOYEE, Role.ADMIN]),
-    paginationQueryParamsMiddleware,
+    paginate.middleware(),
     asyncHandler(getAllGraduationGroupsHandler)
   );
 
