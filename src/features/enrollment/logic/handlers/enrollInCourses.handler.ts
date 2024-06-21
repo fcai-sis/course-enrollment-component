@@ -31,10 +31,20 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
   const { user, coursesToEnrollIn } = req.body;
 
   const studentUser = await UserModel.findById(user.userId);
-  if (!studentUser) return res.status(404).json({ message: "User not found" });
+  if (!studentUser)
+    return res.status(404).json({
+      error: {
+        message: "User not found",
+      },
+    });
 
   const student = await StudentModel.findOne({ user: studentUser._id });
-  if (!student) return res.status(404).json({ message: "Student not found" });
+  if (!student)
+    return res.status(404).json({
+      error: {
+        message: "Student not found",
+      },
+    });
   const studentId = student._id;
 
   const latestSemester = await SemesterModel.findOne(
@@ -43,7 +53,11 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
     { sort: { startDate: -1 } }
   );
   if (!latestSemester)
-    return res.status(404).json({ message: "No semester found" });
+    return res.status(404).json({
+      error: {
+        message: "No semester found",
+      },
+    });
   const latestSemesterId = latestSemester._id;
 
   const coursesAvailableThisSemester = await SemesterCourseModel.find({
@@ -63,8 +77,10 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
 
   if (coursesToEnrollInThatAreNotAvailableThisSemester.length > 0) {
     return res.status(400).json({
-      message: "Some courses are not available this semester",
-      courses: coursesToEnrollInThatAreNotAvailableThisSemester,
+      error: {
+        message: "Some courses are not available this semester",
+        courses: coursesToEnrollInThatAreNotAvailableThisSemester,
+      },
     });
   }
 
@@ -100,8 +116,10 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
 
   if (coursesToEnrollInThatAreAlreadyPassedOrEnrolledIn.length > 0) {
     return res.status(400).json({
-      message: "Some courses are already passed or enrolled in",
-      courses: coursesToEnrollInThatAreAlreadyPassedOrEnrolledIn,
+      error: {
+        message: "Some courses are already passed or enrolled in",
+        courses: coursesToEnrollInThatAreAlreadyPassedOrEnrolledIn,
+      },
     });
   }
 
@@ -124,10 +142,12 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
 
   if (prerequisitesNotMet.length > 0) {
     return res.status(400).json({
-      message: "Prerequisites not met",
-      prerequisites: prerequisitesNotMet.map(
-        (prerequisite) => prerequisite.code
-      ),
+      error: {
+        message: "Prerequisites not met",
+        prerequisites: prerequisitesNotMet.map(
+          (prerequisite) => prerequisite.code
+        ),
+      },
     });
   }
 
