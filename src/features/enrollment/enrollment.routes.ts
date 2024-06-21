@@ -6,7 +6,6 @@ import updateEnrollmentHandler from "./logic/handlers/updateEnrollment.handler";
 import fetchEnrolledCourses from "./logic/handlers/fetchEnrolledCourses.handler";
 import fetchEligibleCourses from "./logic/handlers/fetchEligibleCourses.handler";
 import getPassedCoursesMiddleware from "./logic/middlewares/getPassedCourses.middleware";
-// import validateUpdateEnrollmentRequestBodyMiddleware from "./logic/middlewares/updateEnrollmentRequestBody.middleware";
 import adminCreateEnrollmentHandler from "./logic/handlers/adminCreateEnrollment.handler";
 import flushSemesterEnrollmentsHandler from "./logic/handlers/flushSemesterEnrollments.handler";
 import enrollInCoursesHandler from "./logic/handlers/enrollInCourses.handler";
@@ -16,6 +15,7 @@ import fetchStudentCoursesHandler from "./logic/handlers/fetchStudentCourses.han
 import validateEnrollInCoursesRequestMiddleware from "./logic/middlewares/validateEnrollIntoCourses.middleware";
 import assignHallsHandler from "./logic/handlers/assignHalls.handler";
 import validateAssignHallRequestMiddleware from "./logic/middlewares/assignHallRequest.middleware";
+import validateUpdateEnrollmentRequestBodyMiddleware from "./logic/middlewares/updateEnrollmentRequestBody.middleware";
 
 export default (router: Router) => {
   // Enroll in courses
@@ -52,7 +52,7 @@ export default (router: Router) => {
     "/update",
 
     checkRole([Role.EMPLOYEE, Role.ADMIN]),
-    // validateUpdateEnrollmentRequestBodyMiddleware,
+    validateUpdateEnrollmentRequestBodyMiddleware,
     asyncHandler(updateEnrollmentHandler)
   );
 
