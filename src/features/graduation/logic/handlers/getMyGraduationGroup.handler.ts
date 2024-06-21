@@ -17,9 +17,7 @@ type HandlerRequest = Request<
 const handler = async (req: HandlerRequest, res: Response) => {
   const { userId } = req.body.user;
 
-  const student = await StudentModel.findOne({
-    userId,
-  });
+  const student = await StudentModel.findOne({ user: userId });
 
   if (!student) {
     return res.status(404).json({
@@ -29,12 +27,11 @@ const handler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
-  const studentEnrollment = await EnrollmentModel.findOne({
-    studentId: student._id,
+  // TODO: figure out why i can't do the older query
+  const studentEnrollment = await EnrollmentModel.find({
+    student: student._id,
   }).populate({
-    path: "courseId",
-    match: { courseType: "graduation" },
-    select: "courseType",
+    path: "course",
   });
 
   if (!studentEnrollment) {
@@ -45,13 +42,27 @@ const handler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
+  const graduationEnrollment = studentEnrollment.find(
+    (enrollment) => enrollment.course.courseType === "GRADUATION"
+  );
+
+  if (!graduationEnrollment) {
+    return res.status(404).json({
+      error: {
+        message: "Graduation enrollment not found",
+      },
+    });
+  }
+
   const graduationGroup = await GraduationProjectTeamModel.findOne({
-    enrollments: studentEnrollment._id,
+    enrollments: graduationEnrollment._id,
   });
 
   if (!graduationGroup) {
     return res.status(404).json({
-      message: "Graduation group not found",
+      error: {
+        message: "Graduation group not found",
+      },
     });
   }
 
