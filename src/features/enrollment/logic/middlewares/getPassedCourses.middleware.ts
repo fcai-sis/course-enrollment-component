@@ -19,24 +19,25 @@ const getPassedCoursesMiddleware = async (
       },
     });
 
-  const studentId = student._id;
-  const passedCourses: any = [];
-
-  // Get all enrollments with this student ID that have the course status marked as "passed"
-  const enrollments = await EnrollmentModel.find({
-    student: studentId,
-    status: EnrollmentStatusEnum[1],
+  const studentsEnrollments = await EnrollmentModel.find({
+    student: student._id,
   }).populate("course");
 
-  // Append the course ID to the passedCourses array
-  // enrollments.forEach((enrollment) => {
-  //   passedCourses.push(enrollment.courseId);
-  // });
+  if (!studentsEnrollments)
+    return res.status(500).json({
+      error: {
+        message: "An error occurred while fetching student enrollments",
+      },
+    });
+
+  const passedCourses = studentsEnrollments
+    .filter((enrollment) => enrollment.status === EnrollmentStatusEnum[1])
+    .map((enrollment) => enrollment.course);
 
   // Add the passed courses to the request body
   req.body = {
     ...req.body,
-    passedCourses: enrollments.map((enrollment) => enrollment.course),
+    passedCourses,
   };
 
   next();
