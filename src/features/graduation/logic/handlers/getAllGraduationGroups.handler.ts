@@ -11,7 +11,7 @@ const handler = async (req: Request, res: Response) => {
       __v: 0,
     },
     {
-      skip: req.skip,
+      skip: req.skip ?? 0,
       limit: req.query.limit as unknown as number,
     }
   );
