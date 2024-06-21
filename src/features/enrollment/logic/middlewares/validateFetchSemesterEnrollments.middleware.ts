@@ -1,5 +1,5 @@
+import { validateRequestMiddleware } from "@fcai-sis/shared-middlewares";
 import { CourseModel, SemesterModel } from "@fcai-sis/shared-models";
-import { Request, Response, NextFunction } from "express";
 import * as validator from "express-validator";
 
 const middlewares = [
@@ -39,22 +39,7 @@ const middlewares = [
       return true;
     }),
 
-  (req: Request, res: Response, next: NextFunction) => {
-    const errors = validator.validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        error: {
-          message: errors.array()[0].msg,
-        },
-      });
-    }
-
-    if (req.body.semesterId) req.body.semesterId = req.body.semesterId.trim();
-    req.body.courseId = req.params.courseId.trim();
-
-    next();
-  },
+  validateRequestMiddleware,
 ];
 
 const validateFetchSemesterEnrollmentsMiddleware = middlewares;
