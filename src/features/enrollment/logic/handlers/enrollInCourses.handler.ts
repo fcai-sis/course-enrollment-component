@@ -46,20 +46,20 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
     return res.status(404).json({ message: "No semester found" });
   const latestSemesterId = latestSemester._id;
 
-  const coursesAvailableThisSemester = (
-    await SemesterCourseModel.find({
-      semester: latestSemesterId,
-    }).populate("course")
-  ).map((semesterCourse) => semesterCourse.course);
+  const coursesAvailableThisSemester = await SemesterCourseModel.find({
+    semester: latestSemesterId,
+  }).populate("course");
 
   const coursesToEnrollInThatAreNotAvailableThisSemester =
-    coursesToEnrollIn.filter(
-      (courseToEnrollIn) =>
-        !coursesAvailableThisSemester.some(
-          (availableCourse) =>
-            courseToEnrollIn.courseCode === availableCourse.courseCode
-        )
-    );
+    coursesToEnrollIn.filter((courseToEnrollIn) => {
+      const codesForCoursesThatAreAvailableThisSemester =
+        coursesAvailableThisSemester.map(
+          (availableCourse) => availableCourse.course.code
+        );
+      return !codesForCoursesThatAreAvailableThisSemester.includes(
+        courseToEnrollIn.courseCode
+      );
+    });
 
   if (coursesToEnrollInThatAreNotAvailableThisSemester.length > 0) {
     return res.status(400).json({
@@ -70,10 +70,9 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
 
   const coursesToEnrollInThatAreAvailableThisSemester =
     coursesAvailableThisSemester.filter((availableCourse) =>
-      coursesToEnrollIn.some(
-        (courseToEnrollIn) =>
-          courseToEnrollIn.courseCode === availableCourse.courseCode
-      )
+      coursesToEnrollIn.some((courseToEnrollIn) => {
+        return availableCourse.course.code === courseToEnrollIn.courseCode;
+      })
     );
 
   const studentsEnrollments = await EnrollmentModel.find({
@@ -88,11 +87,16 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
   );
 
   const coursesToEnrollInThatAreAlreadyPassedOrEnrolledIn =
-    coursesToEnrollInThatAreAvailableThisSemester.filter((course) =>
-      [...passedCourses, ...enrolledCourses].some(
-        (enrollment) => enrollment.course.courseCode === course.courseCode
-      )
-    );
+    coursesToEnrollInThatAreAvailableThisSemester.filter((courseToEnrollIn) => {
+      const passedAndEnrolledCourses = [
+        ...passedCourses,
+        ...enrolledCourses.map((enrollment) => enrollment.course),
+      ];
+
+      return passedAndEnrolledCourses.some((passedOrEnrolledCourse) => {
+        return passedOrEnrolledCourse.code === courseToEnrollIn.course.code;
+      });
+    });
 
   if (coursesToEnrollInThatAreAlreadyPassedOrEnrolledIn.length > 0) {
     return res.status(400).json({
@@ -105,30 +109,32 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
     await CoursePrerequisiteModel.find({
       course: {
         $in: coursesToEnrollInThatAreAvailableThisSemester.map(
-          (course) => course._id
+          (course) => course.course._id
         ),
       },
-    })
+    }).populate("prerequisite")
   ).map((coursePrerequisite) => coursePrerequisite.prerequisite);
 
   const prerequisitesNotMet = prerequisitesOfCoursesToEnrollIn.filter(
     (prerequisite) =>
       !passedCourses.some(
-        (course) => course._id.toString() === prerequisite.toString()
+        (course) => course._id.toString() === prerequisite._id.toString()
       )
   );
 
   if (prerequisitesNotMet.length > 0) {
     return res.status(400).json({
       message: "Prerequisites not met",
-      prerequisites: prerequisitesNotMet,
+      prerequisites: prerequisitesNotMet.map(
+        (prerequisite) => prerequisite.code
+      ),
     });
   }
 
   for (const courseToEnrollIn of coursesToEnrollInThatAreAvailableThisSemester) {
     await EnrollmentModel.create({
       student: studentId,
-      course: courseToEnrollIn._id,
+      course: courseToEnrollIn.course._id,
       semester: latestSemesterId,
       group: courseToEnrollIn.group,
     });
