@@ -15,26 +15,22 @@ type HandlerRequest = Request<
 
 const handler = async (req: HandlerRequest, res: Response) => {
   const type = req.query.type;
-  const page = req.context.page;
-  const pageSize = req.context.pageSize;
 
   const query = type ? { type } : {};
 
-  const evaluationQuestions = await EvaluationQuestionModel
-    .find(query)
-    .skip((page - 1) * pageSize)
-    .limit(pageSize)
+  const evaluationQuestions = await EvaluationQuestionModel.find(query)
+    .skip(req.skip ?? 0)
+    .limit(req.query.limit as unknown as number)
     .exec();
 
   const count = await EvaluationQuestionModel.countDocuments(query);
-  const totalPages = Math.ceil(count / pageSize);
+  const totalPages = Math.ceil(count / (req.query.limit as unknown as number));
 
   return res.status(200).json({
     evaluationQuestions,
     count,
     totalPages,
-    CurrentPage: page,
-    pageSize: pageSize
+    pageSize: req.query.limit,
   });
 };
 
