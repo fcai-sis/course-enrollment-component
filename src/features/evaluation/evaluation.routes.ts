@@ -11,9 +11,9 @@ import paginate from "express-paginate";
 import updateEvaluationQuestionValidatorMiddleware from "./evaluationQuestion-logic/middlewares/updateEvaluationQuestionValidator.middleware";
 import updateEvaluationQuestionHandler from "./evaluationQuestion-logic/handlers/updateEvaluationQuestion.handler";
 
-const evaluationRoutes = (router: Router) => {
+const evaluationQuestionRoutes = (router: Router) => {
   router.post(
-    "/questions",
+    "/",
 
     createEvaluationQuestionValidatorMiddleware,
 
@@ -21,7 +21,7 @@ const evaluationRoutes = (router: Router) => {
   );
 
   router.delete(
-    "/questions/:evaluationQuestionId",
+    "/:evaluationQuestionId",
 
     ensureEvaluationQuestionIdInParamsMiddleware,
 
@@ -29,7 +29,7 @@ const evaluationRoutes = (router: Router) => {
   );
 
   router.get(
-    "/questions",
+    "/",
 
     validateTypeFieldMiddleware,
 
@@ -37,7 +37,7 @@ const evaluationRoutes = (router: Router) => {
   );
 
   router.get(
-    "/questions/read",
+    "/read",
 
     validateTypeFieldMiddleware,
     paginate.middleware(),
@@ -46,7 +46,7 @@ const evaluationRoutes = (router: Router) => {
   );
 
   router.patch(
-    "/questions/:evaluationQuestionId",
+    "/:evaluationQuestionId",
 
     ensureEvaluationQuestionIdInParamsMiddleware,
     updateEvaluationQuestionValidatorMiddleware,
@@ -55,4 +55,4 @@ const evaluationRoutes = (router: Router) => {
   );
 };
 
-export default evaluationRoutes;
+export default evaluationQuestionRoutes;
