@@ -34,11 +34,19 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
   await graduationProject.save();
 
+  if (!graduationProject) {
+    return res.status(500).json({
+      error: {
+        message: "Failed to create graduation project group",
+      },
+    });
+  }
+
   const response = {
     message: "Graduation project group created successfully",
     graduationProject,
   };
-
+  
   return res.status(201).json(response);
 };
 
