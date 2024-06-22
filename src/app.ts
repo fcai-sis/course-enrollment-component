@@ -7,6 +7,7 @@ import express, { NextFunction, Request, Response } from "express";
 import {
   bylawRouter,
   enrollmentRouter,
+  evaluationQuestionRouter,
   gradeRouter,
   graduationGroupRouter,
 } from "./router";
@@ -56,6 +57,7 @@ app.use("/enrollment", enrollmentRouter());
 app.use("/graduation-group", graduationGroupRouter());
 app.use("/grade", gradeRouter());
 app.use("/bylaw", bylawRouter());
+app.use("/questions", evaluationQuestionRouter());
 
 // TODO: Custom 404 handler
 app.use((req: Request, res: Response, next: NextFunction) => {

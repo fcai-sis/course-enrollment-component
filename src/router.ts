@@ -4,6 +4,7 @@ import enrollmentRoutes from "./features/enrollment/enrollment.routes";
 import graduationGroupRoutes from "./features/graduation/graduationgroup.routes";
 import gradeRoutes from "./features/grades/logic/grade.routes";
 import bylawRoutes from "./features/bylaw/bylaw.routes";
+import evaluationQuestionRoutes from "./features/evaluation/evaluation.routes";
 
 export const enrollmentRouter = () => {
   const router = Router();
@@ -27,4 +28,10 @@ export const bylawRouter = () => {
   const router = Router();
   bylawRoutes(router);
   return router;
-}
+};
+
+export const evaluationQuestionRouter = () => {
+  const router = Router();
+  evaluationQuestionRoutes(router);
+  return router;
+};
