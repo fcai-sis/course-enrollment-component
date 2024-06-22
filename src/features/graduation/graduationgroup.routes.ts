@@ -19,7 +19,7 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.post(
     "/create",
-    checkRole([Role.STUDENT, Role.INSTUCTOR]),
+    checkRole([Role.EMPLOYEE, Role.INSTUCTOR]),
     createGraduationGroupRequestBodyMiddleware,
     asyncHandler(CreateGraduationGroupHandler)
   );
