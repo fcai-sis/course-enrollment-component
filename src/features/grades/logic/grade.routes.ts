@@ -1,40 +1,20 @@
 import { asyncHandler } from "@fcai-sis/shared-utilities";
 import { Router } from "express";
-import addScoreHandler from "./handlers/addScore.handler";
 import ensureEnrollmentIdInParamsMiddleware from "./middlewares/ensureEnrollmentIdInParams.middleware";
-import addScoreRequestMiddleware from "./middlewares/addScoreRequest.middleware";
-import updateScoreHandler from "./handlers/updateScore.handler";
 import { Role, checkRole } from "@fcai-sis/shared-middlewares";
-import updateFinalExamScoreHandler from "./handlers/updateFinalExamScore.handler";
-import updateFinalExamMiddleware from "./middlewares/updateFinalExamScore.middleware";
+import updateGradesHandler from "./handlers/updateGrades.handler";
+import updateGradesRequestMiddleware from "./middlewares/updateGradesRequest.middleware";
 
 const gradeRoutes = (router: Router) => {
   /**
-   * Add new scores to an existing grade
+   * Update grades of an existing enrollment
    */
-
   router.patch(
-    "/addscore/:enrollmentId",
-    checkRole([Role.INSTUCTOR, Role.ADMIN]),
+    "/update/:enrollmentId",
+    checkRole([Role.INSTUCTOR, Role.EMPLOYEE]),
     ensureEnrollmentIdInParamsMiddleware,
-    addScoreRequestMiddleware,
-    asyncHandler(addScoreHandler)
-  );
-
-  router.patch(
-    "/updatescore/:enrollmentId",
-    checkRole([Role.INSTUCTOR, Role.ADMIN]),
-    ensureEnrollmentIdInParamsMiddleware,
-    addScoreRequestMiddleware,
-    asyncHandler(updateScoreHandler)
-  );
-
-  router.patch(
-    "/updatefinal/:enrollmentId",
-    checkRole([Role.INSTUCTOR, Role.ADMIN]),
-    ensureEnrollmentIdInParamsMiddleware,
-    updateFinalExamMiddleware,
-    asyncHandler(updateFinalExamScoreHandler)
+    updateGradesRequestMiddleware,
+    asyncHandler(updateGradesHandler)
   );
 };
 

@@ -15,9 +15,9 @@ type HandlerRequest = Request<
 /**
  * Fetches all courses that a student is enrolled in
  */
-const handler = async (req: HandlerRequest, res: Response) => {
+const fetchEnrolledCourses = async (req: HandlerRequest, res: Response) => {
   const { userId } = req.body.user;
-  const student = await StudentModel.findOne({ userId });
+  const student = await StudentModel.findOne({ user: userId });
 
   if (!student) {
     return res.status(404).json({
@@ -25,29 +25,27 @@ const handler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
-  const studentId = student?._id;
-
   // Find all enrollments with this student ID
-  const enrolledCourses = await EnrollmentModel.find(
-    { studentId },
-    {
-      __v: 0,
-      _id: 0,
-      studentId: 0,
-    }
-  ).populate({
-    path: "courseId",
-    select: "code -_id",
+  const enrollments = await EnrollmentModel.find({
+    student: student._id,
+  }).populate({
+    path: "course",
+    select: "code creditHours -_id",
   });
 
   const response = {
-    studentId,
-    // Return the enrolled courses (course code, status and seat number and exam hall)
-    courses: enrolledCourses,
+    studentId: student.studentId,
+    // Return the enrolled courses
+    courses: enrollments.map((enrollment) => ({
+      courseCode: enrollment.course.code,
+      status: enrollment.status,
+      seatNumber: enrollment.seatNumber,
+      examHall: enrollment.examHall,
+      creditHours: enrollment.course.creditHours,
+    })),
   };
 
   return res.status(200).json(response);
 };
 
-const fetchEnrolledCourses = handler;
 export default fetchEnrolledCourses;

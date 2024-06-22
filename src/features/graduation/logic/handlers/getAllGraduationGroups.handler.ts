@@ -5,12 +5,16 @@ import GraduationProjectTeamModel from "../../data/models/graduationteam.model";
  * Gets all graduation groups
  */
 const handler = async (req: Request, res: Response) => {
-  const page = req.context.page;
-  const pageSize = req.context.pageSize;
-
-  const graduationGroups = await GraduationProjectTeamModel.find()
-    .skip((page - 1) * pageSize)
-    .limit(pageSize);
+  const graduationGroups = await GraduationProjectTeamModel.find(
+    {},
+    {
+      __v: 0,
+    },
+    {
+      skip: req.skip ?? 0,
+      limit: req.query.limit as unknown as number,
+    }
+  );
 
   if (!graduationGroups) {
     return res.status(404).json({
@@ -18,10 +22,11 @@ const handler = async (req: Request, res: Response) => {
     });
   }
 
+  const totalGraduationGroups =
+    await GraduationProjectTeamModel.countDocuments();
   const response = {
     graduationGroups,
-    page,
-    pageSize,
+    totalGraduationGroups,
   };
 
   return res.status(200).json(response);
