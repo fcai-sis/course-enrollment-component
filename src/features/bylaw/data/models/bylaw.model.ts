@@ -1,9 +1,17 @@
+import { DepartmentModel } from "@fcai-sis/shared-models";
 import mongoose, { InferSchemaType, Schema } from "mongoose";
 
 // Define the sub-schema for level requirements
 
 const gradeWeightValidator = (val: number) => {
   return val >= 0 && val <= 6;
+};
+
+const departmentCodeValidator = async (map: Map<string, any>) => {
+  const departmentCodes = Array.from(map.keys());
+  const departments = await DepartmentModel.find({ code: { $in: departmentCodes } });
+  const validCodes = departments.map(department => department.code);
+  return departmentCodes.every(code => validCodes.includes(code));
 };
 
 const gradeSchema = new Schema({
@@ -119,6 +127,10 @@ export const bylawSchema = new Schema({
     type: Map,
     of: graduationProjectRequirementSchema,
     required: true,
+    validate: {
+      validator: departmentCodeValidator,
+      message: "Invalid department code in graduationProjectRequirements",
+    }
   },
 
   yearApplied: {
