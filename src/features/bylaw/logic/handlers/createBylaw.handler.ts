@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { BylawModel } from "../../data/models/bylaw.model";
+import { BylawModel } from "@fcai-sis/shared-models";
 
 type HandlerRequest = Request<
   {},
