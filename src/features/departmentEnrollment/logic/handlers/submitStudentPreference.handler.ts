@@ -1,20 +1,26 @@
 import { Request, Response } from "express";
-import StudentPreferenceModel from "features/departmentEnrollment/data/models/studentPreference.model";
+import { studentPreferenceModel } from "../../data/models/studentPreference.model";
+import { TokenPayload } from "@fcai-sis/shared-middlewares";
+import { StudentModel } from "@fcai-sis/shared-models";
 
 type HandlerRequest = Request<
   {},
   {},
   {
-    studentId: string;
     preferences: string[];
+    user: TokenPayload;
   }
 >;
 
 const handler = async (req: HandlerRequest, res: Response) => {
-  const { studentId, preferences } = req.body;
+  const { user, preferences } = req.body;
 
-  const studentPreference = new StudentPreferenceModel({
-    studentId,
+  const authenticatedStudent = await StudentModel.findOne({
+    user: user.userId,
+  });
+
+  const studentPreference = new studentPreferenceModel({
+    student: authenticatedStudent._id,
     preferences,
   });
 
