@@ -10,10 +10,12 @@ import {
   evaluationQuestionRouter,
   gradeRouter,
   graduationGroupRouter,
+  studentPreferenceRouter,
 } from "./router";
 import { isDev } from "./env";
 import logger from "./core/logger";
 import mongoose from "mongoose";
+import { ForeignKeyNotFound } from "@fcai-sis/shared-utilities";
 
 // Create Express server
 const app = express();
@@ -58,6 +60,7 @@ app.use("/graduation-group", graduationGroupRouter());
 app.use("/grade", gradeRouter());
 app.use("/bylaw", bylawRouter());
 app.use("/questions", evaluationQuestionRouter());
+app.use("/student-preference", studentPreferenceRouter());
 
 // TODO: Custom 404 handler
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -71,6 +74,11 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof mongoose.Error.ValidationError) {
     return res.status(400).json({
       message: err.message,
+    });
+  } else if (err instanceof ForeignKeyNotFound) {
+    return res.status(400).json({
+      message: err.message,
+      code: err.code,
     });
   }
   res.status(500).json({ message: "Something broke on our end" });
