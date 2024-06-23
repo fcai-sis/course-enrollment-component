@@ -33,8 +33,8 @@ const validateCreateBylawRequestMiddleware = [
     .withMessage("gradeWeights must be an object"),
   validator
     .body("gradeWeights.*.weight")
-    .isInt({ min: 0, max: 6 })
-    .withMessage("Grade weights must be between 0 and 6"),
+    .isNumeric()
+    .withMessage("Grade weights must be numeric"),
   validator
     .body("gradeWeights.*.percentage.min")
     .isInt({ min: 0, max: 100 })
@@ -94,19 +94,23 @@ const validateCreateBylawRequestMiddleware = [
         .withMessage("totalHours must be greater than or equal to 0")
         .run(req);
     }
-    
+
     if (req.body.useDetailedGraduationProjectHours) {
       validator
         .body("graduationProjectRequirements.*.mandatoryHours")
         .exists()
-        .withMessage("mandatoryHours is required when useDetailedGraduationProjectHours is true")
+        .withMessage(
+          "mandatoryHours is required when useDetailedGraduationProjectHours is true"
+        )
         .isInt({ min: 0 })
         .withMessage("mandatoryHours must be greater than or equal to 0")
         .run(req);
       validator
         .body("graduationProjectRequirements.*.electiveHours")
         .exists()
-        .withMessage("electiveHours is required when useDetailedGraduationProjectHours is true")
+        .withMessage(
+          "electiveHours is required when useDetailedGraduationProjectHours is true"
+        )
         .isInt({ min: 0 })
         .withMessage("electiveHours must be greater than or equal to 0")
         .run(req);
@@ -114,7 +118,9 @@ const validateCreateBylawRequestMiddleware = [
       validator
         .body("graduationProjectRequirements.*.totalHours")
         .exists()
-        .withMessage("totalHours is required when useDetailedGraduationProjectHours is false")
+        .withMessage(
+          "totalHours is required when useDetailedGraduationProjectHours is false"
+        )
         .isInt({ min: 0 })
         .withMessage("totalHours must be greater than or equal to 0")
         .run(req);
