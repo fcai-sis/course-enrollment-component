@@ -64,8 +64,8 @@ const assignHallsHandler = async (req: HandlerRequest, res: Response) => {
       let found = false;
       while (!found) {
         const otherEnrollment = await EnrollmentModel.findOne({
-          "exam.hall": assignedHall,
-          "exam.seatNumber": seatNumber,
+          examHall: assignedHall,
+          examSeatNumber: seatNumber,
         });
         if (!otherEnrollment) {
           found = true;
