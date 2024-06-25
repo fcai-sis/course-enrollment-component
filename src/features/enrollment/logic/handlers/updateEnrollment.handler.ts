@@ -16,24 +16,22 @@ type HandlerRequest = Request<
   {
     enrollment: IEnrollment;
     status?: EnrollmentStatusEnumType;
-    exam?: {
-      hall?: IHall;
-      seatNumber?: number;
-    };
+    group?: number;
+    examSeatNumber?: number;
+    examHall?: IHall;
   }
 >;
 // TODO: figure out why tf i can't attach the actual enrollment to the request body
 const updateEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
-  const { status, exam, enrollment } = req.body;
+  const { status, group, enrollment, examHall, examSeatNumber } = req.body;
 
   const updatedEnrollment = await EnrollmentModel.findByIdAndUpdate(
     enrollment,
     {
       ...(status && { status }),
-      ...(exam && {
-        "exam.hall": exam.hall,
-        "exam.seatNumber": exam.seatNumber,
-      }),
+      ...(group && { group }),
+      ...(examHall && { examHall }),
+      ...(examSeatNumber && { examSeatNumber }),
     },
     {
       new: true,
