@@ -19,7 +19,7 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.post(
     "/create",
-    checkRole([Role.EMPLOYEE, Role.INSTUCTOR]),
+    checkRole([Role.EMPLOYEE, Role.INSTRUCTOR]),
     createGraduationGroupRequestBodyMiddleware,
     asyncHandler(CreateGraduationGroupHandler)
   );
@@ -30,7 +30,7 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.patch(
     "/update/:groupId",
-    checkRole([Role.INSTUCTOR, Role.EMPLOYEE, Role.ADMIN]),
+    checkRole([Role.INSTRUCTOR, Role.EMPLOYEE, Role.ADMIN]),
     ensureGroupIdInParamsMiddleware,
     updateGraduationGroupRequestBodyMiddleware,
     asyncHandler(updateGraduationGroupHandler)
@@ -51,7 +51,7 @@ const graduationGroupRoutes = (router: Router) => {
    */
   router.get(
     "/:groupId",
-    checkRole([Role.INSTUCTOR, Role.EMPLOYEE, Role.ADMIN]),
+    checkRole([Role.INSTRUCTOR, Role.EMPLOYEE, Role.ADMIN]),
     ensureGroupIdInParamsMiddleware,
     asyncHandler(getGraduationGroupByIdHandler)
   );
@@ -62,7 +62,7 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.get(
     "/",
-    checkRole([Role.INSTUCTOR, Role.EMPLOYEE, Role.ADMIN]),
+    checkRole([Role.INSTRUCTOR, Role.EMPLOYEE, Role.ADMIN]),
     paginate.middleware(),
     asyncHandler(getAllGraduationGroupsHandler)
   );

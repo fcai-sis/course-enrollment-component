@@ -11,7 +11,7 @@ const gradeRoutes = (router: Router) => {
    */
   router.patch(
     "/update/:enrollmentId",
-    checkRole([Role.INSTUCTOR, Role.EMPLOYEE]),
+    checkRole([Role.INSTRUCTOR, Role.EMPLOYEE]),
     ensureEnrollmentIdInParamsMiddleware,
     updateGradesRequestMiddleware,
     asyncHandler(updateGradesHandler)
