@@ -3,23 +3,14 @@ import * as validator from "express-validator";
 
 const middlewares = [
   validator
-    .body("grades")
-
-    .exists()
-    .withMessage("Grades are required")
-
-    .isObject()
-    .withMessage("Grades must be an object"),
-
-  validator
-    .body("grades.finalExam")
+    .body("finalExamMark")
 
     .optional()
     .isNumeric()
     .withMessage("Final exam score must be a number"),
 
   validator
-    .body("grades.termWork")
+    .body("termWorkMark")
 
     .optional()
     .isNumeric()

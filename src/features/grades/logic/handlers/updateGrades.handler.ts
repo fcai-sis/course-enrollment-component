@@ -5,10 +5,8 @@ type HandlerRequest = Request<
   { enrollmentId: string },
   {},
   {
-    grades: {
-      finalExam?: number;
-      termWork?: number;
-    };
+    termWorkMark?: number;
+    finalExamMark?: number;
   }
 >;
 
@@ -17,15 +15,13 @@ type HandlerRequest = Request<
  * */
 const updateGradesHandler = async (req: HandlerRequest, res: Response) => {
   const { enrollmentId } = req.params;
-  const { grades } = req.body;
+  const { termWorkMark, finalExamMark } = req.body;
 
   const enrollment = await EnrollmentModel.findByIdAndUpdate(
     enrollmentId,
     {
-      ...(grades && {
-        "grades.finalExam": grades.finalExam,
-        "grades.termWork": grades.termWork,
-      }),
+      ...(termWorkMark && { termWorkMark }),
+      ...(finalExamMark && { finalExamMark }),
     },
     {
       new: true,
