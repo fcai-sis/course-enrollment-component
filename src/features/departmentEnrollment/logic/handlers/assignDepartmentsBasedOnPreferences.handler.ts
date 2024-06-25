@@ -4,11 +4,12 @@ import {
   AcademicStudentModel,
   DepartmentModel,
   IDepartment,
+  ProgramEnum,
 } from "@fcai-sis/shared-models";
 
-type HandlerRequest = Request<{}, {}, {}>;
+// Handler function to assign departments based on student preferences
 // TODO: this can probably be redone a lot better by making the academic student the FK instead of the student
-const handler = async (req: HandlerRequest, res: Response) => {
+const handler = async (req: Request, res: Response) => {
   const allStudentPreferences = await studentPreferenceModel.find();
   if (allStudentPreferences.length === 0) {
     return res.status(400).json({
@@ -17,12 +18,13 @@ const handler = async (req: HandlerRequest, res: Response) => {
       },
     });
   }
+
   const studentGpas = await AcademicStudentModel.find(
     {
       student: { $in: allStudentPreferences.map((pref) => pref.student._id) },
     },
     {
-      currentGpa: 1,
+      gpa: 1,
     }
   ).populate("student");
 
@@ -42,7 +44,7 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
     return {
       ...pref.toObject(),
-      gpa: studentGpa.currentGpa,
+      gpa: studentGpa.gpa,
     };
   });
 
@@ -50,9 +52,9 @@ const handler = async (req: HandlerRequest, res: Response) => {
     pref.preferences.map((dept: IDepartment) => dept._id)
   );
 
-  // find all departments that are in the preferences (preferences is an array of department ids)
   const departments = await DepartmentModel.find({
     _id: { $in: preferenceIds },
+    program: ProgramEnum[0],
   });
 
   if (departments.length === 0) {
@@ -63,7 +65,6 @@ const handler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
-  // return each department alongside the students who have this department in their preferences
   const departmentsPreferencesAndTheirStudents = await Promise.all(
     departments.map(async (dept) => {
       const students = await studentPreferenceModel.find({
@@ -84,58 +85,72 @@ const handler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
-  // assign each department a threshold based on the average GPA of the students who have this department in their preferences
+  const maxWeight = Math.max(
+    ...allStudentPreferences.map((pref) => pref.preferences.length)
+  );
+
   const departmentThresholds = departmentsPreferencesAndTheirStudents.map(
     (dept) => {
-      const students = studentGpas.filter((studentGpa) =>
-        dept.students.find(
-          (student) =>
-            student._id.toString() === studentGpa.student._id.toString()
-        )
-      );
-      const avgGpa =
-        students.reduce((acc, student) => acc + student.currentGpa, 0) /
-        students.length;
+      let totalWeightedGpa = 0;
+      let totalWeight = 0;
+
+      studentGpas.forEach((studentGpa) => {
+        const studentPref = allStudentPreferences.find(
+          (pref) =>
+            pref.student._id.toString() === studentGpa.student._id.toString()
+        );
+
+        const studentPreferenceIndex = studentPref.preferences.findIndex(
+          (preference: any) =>
+            preference._id.toString() === dept.department._id.toString()
+        );
+
+        const weight = maxWeight - (studentPreferenceIndex + 1);
+        totalWeightedGpa += studentGpa.gpa * weight;
+        totalWeight += weight;
+      });
+
+      const weightedAvgGpa = totalWeightedGpa / totalWeight;
+
       return {
         department: dept.department,
-        threshold: avgGpa,
+        threshold: weightedAvgGpa,
       };
     }
   );
 
-  // sort departments based on their threshold
   const sortedDepartments = departmentThresholds.sort(
     (a, b) => b.threshold - a.threshold
   );
 
-  // assign students to departments based on their preferences and assign them the first threshold they qualify for
   const assignedDepartments = allStudentPreferencesAndTheirGpa.map((pref) => {
     const student = pref.student;
 
     let assignedDepartment = null;
-    for (const dept of sortedDepartments) {
-      if (
-        pref.preferences.toString().includes(dept.department._id.toString())
-      ) {
-        if (pref.gpa >= dept.threshold) {
-          assignedDepartment = dept.department;
 
-          break;
-        }
+    for (const preference of pref.preferences) {
+      const dept = sortedDepartments.find(
+        (sortedDept) =>
+          sortedDept.department._id.toString() === preference._id.toString()
+      );
+
+      if (dept && pref.gpa >= dept.threshold) {
+        assignedDepartment = dept.department;
+        break;
       }
     }
+
     return {
       student,
       department: assignedDepartment,
     };
   });
 
-  // update the student's department in the database
   await Promise.all(
     assignedDepartments.map(async (assignment) => {
       await AcademicStudentModel.updateOne(
         { student: assignment.student._id },
-        { currentDepartment: assignment.department }
+        { major: assignment.department }
       );
     })
   );
