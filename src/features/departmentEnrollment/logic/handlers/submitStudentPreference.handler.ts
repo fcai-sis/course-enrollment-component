@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
 import { studentPreferenceModel } from "../../data/models/studentPreference.model";
 import { TokenPayload } from "@fcai-sis/shared-middlewares";
-import { AcademicStudentModel, StudentModel } from "@fcai-sis/shared-models";
+import {
+  AcademicStudentModel,
+  DepartmentModel,
+  StudentModel,
+} from "@fcai-sis/shared-models";
 
 type HandlerRequest = Request<
   {},
@@ -40,9 +44,18 @@ const handler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
+  // we need to convert the department codes to department ids
+  const mapCodeToId = async (code: string) => {
+    const department = await DepartmentModel.findOne({ code }).select("_id");
+
+    return department?._id;
+  };
+
+  const preferencesIds = await Promise.all(preferences.map(mapCodeToId));
+
   const studentPreference = new studentPreferenceModel({
     student: authenticatedStudent._id,
-    preferences,
+    preferences: preferencesIds,
   });
 
   await studentPreference.save();

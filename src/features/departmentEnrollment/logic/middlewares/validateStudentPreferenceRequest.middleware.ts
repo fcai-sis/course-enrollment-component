@@ -8,9 +8,7 @@ const validateStudentPreferenceRequestMiddleware = [
     .exists()
     .withMessage("Department preferences are required")
     .isArray()
-    .withMessage(
-      "Department preferences must be an array of department IDs"
-    )
+    .withMessage("Department preferences must be an array of department IDs")
     .custom(async (preferences: string[]) => {
       // make sure the array length is the same as the length of all departments in the database
       const departments = await DepartmentModel.find({
@@ -25,8 +23,8 @@ const validateStudentPreferenceRequestMiddleware = [
     }),
   validator
     .body("preferences.*")
-    .isMongoId()
-    .withMessage("Each department ID must be a valid MongoDB ID"),
+    .isString()
+    .withMessage("Each department ID must be a string"),
 
   validateRequestMiddleware,
 ];
