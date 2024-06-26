@@ -60,7 +60,7 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
   await studentPreference.save();
 
-  return res.status(200).json({
+  return res.status(201).json({
     message: "Student preferences submitted successfully",
   });
 };
