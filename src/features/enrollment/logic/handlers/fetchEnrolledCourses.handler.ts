@@ -56,10 +56,15 @@ const fetchEnrolledCourses = async (req: HandlerRequest, res: Response) => {
     student: student._id,
   });
 
+  const passedEnrollments = enrollments.filter(
+    (enrollment) => enrollment.status === "PASSED"
+  );
+
   const response = {
     // Return the enrolled courses
     courses: enrollments,
     totalStudentEnrollments,
+    passedCourses: passedEnrollments,
   };
 
   return res.status(200).json(response);
