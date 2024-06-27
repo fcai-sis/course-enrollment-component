@@ -14,7 +14,7 @@ import validateEnrollInCoursesRequestMiddleware from "./logic/middlewares/valida
 import assignHallsHandler from "./logic/handlers/assignHalls.handler";
 import validateAssignHallRequestMiddleware from "./logic/middlewares/assignHallRequest.middleware";
 import validateUpdateEnrollmentRequestBodyMiddleware from "./logic/middlewares/updateEnrollmentRequestBody.middleware";
-
+import paginate from "express-paginate";
 export default (router: Router) => {
   // Enroll in courses
   router.post(
@@ -43,6 +43,7 @@ export default (router: Router) => {
   router.get(
     "/enrolled",
     checkRole([Role.STUDENT]),
+    paginate.middleware(),
     asyncHandler(fetchEnrolledCourses)
   );
 

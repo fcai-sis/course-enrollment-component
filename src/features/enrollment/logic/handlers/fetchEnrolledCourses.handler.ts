@@ -9,6 +9,10 @@ type HandlerRequest = Request<
   {},
   {
     user: TokenPayload;
+  },
+  {
+    limit?: number;
+    skip?: number;
   }
 >;
 
@@ -17,32 +21,45 @@ type HandlerRequest = Request<
  */
 const fetchEnrolledCourses = async (req: HandlerRequest, res: Response) => {
   const { userId } = req.body.user;
+  const { limit, skip } = req.query;
   const student = await StudentModel.findOne({ user: userId });
 
   if (!student) {
     return res.status(404).json({
-      message: "Student not found",
+      error: {
+        message: "Student not found",
+      },
     });
   }
 
   // Find all enrollments with this student ID
-  const enrollments = await EnrollmentModel.find({
+  const enrollments = await EnrollmentModel.find(
+    {
+      student: student._id,
+    },
+    {},
+    {
+      skip,
+      limit,
+    }
+  )
+    .populate({
+      path: "course",
+      select: "code creditHours name -_id",
+    })
+    .populate({
+      path: "examHall",
+      select: "name -_id",
+    });
+
+  const totalStudentEnrollments = await EnrollmentModel.countDocuments({
     student: student._id,
-  }).populate({
-    path: "course",
-    select: "code creditHours -_id",
   });
 
   const response = {
-    studentId: student.studentId,
     // Return the enrolled courses
-    courses: enrollments.map((enrollment) => ({
-      courseCode: enrollment.course.code,
-      status: enrollment.status,
-      seatNumber: enrollment.seatNumber,
-      examHall: enrollment.examHall,
-      creditHours: enrollment.course.creditHours,
-    })),
+    courses: enrollments,
+    totalStudentEnrollments,
   };
 
   return res.status(200).json(response);
