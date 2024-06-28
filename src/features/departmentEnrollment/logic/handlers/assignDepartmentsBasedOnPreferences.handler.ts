@@ -54,7 +54,7 @@ const handler = async (req: Request, res: Response) => {
 
   const departments = await DepartmentModel.find({
     _id: { $in: preferenceIds },
-    program: ProgramEnum[0],
+    program: ProgramEnum[1],
   });
 
   if (departments.length === 0) {
