@@ -1,6 +1,6 @@
 import * as validator from "express-validator";
 import { validateRequestMiddleware } from "@fcai-sis/shared-middlewares";
-import { DepartmentModel } from "@fcai-sis/shared-models";
+import { DepartmentModel, ProgramEnum } from "@fcai-sis/shared-models";
 
 const validateStudentPreferenceRequestMiddleware = [
   validator
@@ -12,7 +12,7 @@ const validateStudentPreferenceRequestMiddleware = [
     .custom(async (preferences: string[]) => {
       // make sure the array length is the same as the length of all departments in the database
       const departments = await DepartmentModel.find({
-        program: "GENERAL",
+        program: ProgramEnum["1"],
       });
 
       if (departments.length !== preferences.length) {
