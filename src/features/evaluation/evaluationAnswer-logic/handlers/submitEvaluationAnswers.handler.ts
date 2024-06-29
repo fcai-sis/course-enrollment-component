@@ -1,35 +1,70 @@
 import { Request, Response } from "express";
-import { EvaluationAnswerModel, EvaluationAnswerType } from "../../data/models/evaluationAnswer.model";
+import {
+  EvaluationAnswerModel,
+  EvaluationAnswerType,
+} from "../../data/models/evaluationAnswer.model";
+import { TokenPayload } from "@fcai-sis/shared-middlewares";
+import { EnrollmentModel, StudentModel } from "@fcai-sis/shared-models";
 
 type HandlerRequest = Request<
-    {},
-    {},
-    {
-        enrollment: string;
-        evaluationAnswers: Omit<EvaluationAnswerType, "enrollment">[];
-
-    }
+  {},
+  {},
+  {
+    enrollment: string;
+    evaluationAnswers: Omit<EvaluationAnswerType, "enrollment">[];
+    user: TokenPayload;
+  }
 >;
 
 /**
  * Creates a new evaluation answer
  */
-export const submitEvaluationAnswersHandler = async (req: HandlerRequest, res: Response) => {
-    const { enrollment, evaluationAnswers } = req.body;
-    const createdEvaluationAnswers = await EvaluationAnswerModel.insertMany(
-        evaluationAnswers.map((evaluationAnswer) => ({
-            ...evaluationAnswer,
-            enrollment: enrollment,
-        }))
-    );
+export const submitEvaluationAnswersHandler = async (
+  req: HandlerRequest,
+  res: Response
+) => {
+  const { enrollment: submittedEnrollment, evaluationAnswers, user } = req.body;
 
-    return res.status(201).json({
-        message: "Evaluation answers created successfully",
-        evaluationAnswers: createdEvaluationAnswers,
+  // check if the user is the same as the one who is submitting the evaluation answers
+  const student = await StudentModel.findOne({ user: user.userId });
+  if (!student) {
+    return res.status(404).json({
+      error: {
+        message: "Student not found",
+      },
     });
-}
+  }
+
+  const enrollment = await EnrollmentModel.findById(submittedEnrollment);
+  if (!enrollment) {
+    return res.status(404).json({
+      error: {
+        message: "Enrollment not found",
+      },
+    });
+  }
+
+  // check if the enrollment belongs to the student
+  if (enrollment.student.toString() !== student._id.toString()) {
+    return res.status(403).json({
+      error: {
+        message:
+          "You are not allowed to submit evaluation answers for this enrollment",
+      },
+    });
+  }
+
+  const createdEvaluationAnswers = await EvaluationAnswerModel.insertMany(
+    evaluationAnswers.map((evaluationAnswer) => ({
+      ...evaluationAnswer,
+      enrollment: submittedEnrollment,
+    }))
+  );
+
+  return res.status(201).json({
+    message: "Evaluation answers created successfully",
+    evaluationAnswers: createdEvaluationAnswers,
+  });
+};
 
 export default submitEvaluationAnswersHandler;
-
-
-
