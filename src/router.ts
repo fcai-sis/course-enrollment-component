@@ -4,8 +4,9 @@ import enrollmentRoutes from "./features/enrollment/enrollment.routes";
 import graduationGroupRoutes from "./features/graduation/graduationgroup.routes";
 import gradeRoutes from "./features/grades/logic/grade.routes";
 import bylawRoutes from "./features/bylaw/bylaw.routes";
-import evaluationQuestionRoutes from "./features/evaluation/evaluation.routes";
+import evaluationQuestionRoutes from "./features/evaluation/evaluationQuestion.routes";
 import studentPreferenceRoutes from "./features/departmentEnrollment/studentPreference.routes";
+import evaluationAnswerRoutes from "./features/evaluation/evaluationAnswer-logic/evaluationAnswer.routes";
 
 export const enrollmentRouter = () => {
   const router = Router();
@@ -34,6 +35,12 @@ export const bylawRouter = () => {
 export const evaluationQuestionRouter = () => {
   const router = Router();
   evaluationQuestionRoutes(router);
+  return router;
+};
+
+export const evaluationAnswerRouter = () => {
+  const router = Router();
+  evaluationAnswerRoutes(router);
   return router;
 };
 

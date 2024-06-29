@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import EvaluationQuestionModel from "../../data/models/evaluationQuestion.model";
-import EvaluationAnswerModel from "features/evaluation/data/models/evaluationAnswer.model";
+import { EvaluationAnswerModel } from "../../data/models/evaluationAnswer.model";
 
 
 type HandlerRequest = Request<

@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
-import EvaluationQuestionModel from "../../data/models/evaluationQuestion.model";
+import  { EvaluationQuestionModel, EvaluationQuestionType } from "../../data/models/evaluationQuestion.model";
 
 type HandlerRequest = Request<
     {},
     {},
     {
-        question: string;
-        type: string;
+        evaluationQuestion: EvaluationQuestionType;
     }
 >;
 
@@ -14,18 +13,20 @@ type HandlerRequest = Request<
  * Creates a new evaluation question
  */
 export const createEvaluationQuestionHandler = async (req: HandlerRequest, res: Response) => {
-    const { question, type } = req.body;
-    const evaluationQuestion = new EvaluationQuestionModel({
-        question,
-        type,
-    });
+    const { evaluationQuestion } = req.body;
+    const createdEvaluationQuestion = await EvaluationQuestionModel.create(
+        {
+            question: evaluationQuestion.question,
+            type: evaluationQuestion.type,
+        });
 
-    await evaluationQuestion.save();
-
-    return res.status(201).json({
-        message: "Evaluation question created successfully",
-        evaluationQuestion,
-    });
+        const response = {
+            evaluationQuestion: {
+                name: createdEvaluationQuestion.question,
+                type: createdEvaluationQuestion.type,
+            }
+        };
+        return res.status(201).json(response);
 };
 
 export default createEvaluationQuestionHandler;

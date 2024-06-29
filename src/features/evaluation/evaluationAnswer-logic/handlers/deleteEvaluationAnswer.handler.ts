@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import EvaluationAnswerModel from "../../data/models/evaluationAnswer.model";
+import { EvaluationAnswerModel } from "../../data/models/evaluationAnswer.model";
 
 type HandlerRequest = Request<{ evaluationAnswerId: string }, {}, {}>;
 

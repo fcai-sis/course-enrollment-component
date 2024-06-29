@@ -3,14 +3,21 @@ import { evaluationQuestionModelName } from "./evaluationQuestion.model";
 import { enrollmentModelName } from "@fcai-sis/shared-models";
 import { ForeignKeyNotFound } from "../../../utils/customError.exception";
 
+export interface IEvaluationAnswer extends mongoose.Document {
+    question:  mongoose.Schema.Types.ObjectId;
+    enrollment:  mongoose.Schema.Types.ObjectId;
+    answer: number;
+}
 
-export const evaluationAnswerSchema = new Schema({
-    questionId: {
+export type EvaluationAnswerType = Omit<IEvaluationAnswer, keyof mongoose.Document>;
+
+export const evaluationAnswerSchema = new mongoose.Schema<IEvaluationAnswer>({
+    question: {
         type: Schema.Types.ObjectId,
         ref: evaluationQuestionModelName,
         required: true,
     },
-    enrollmentId: {
+    enrollment: {
         type: Schema.Types.ObjectId,
         ref: enrollmentModelName,
         required: true,
@@ -27,14 +34,14 @@ evaluationAnswerSchema.pre("save", async function (next) {
     try {
         const enrollment = await mongoose
             .model(enrollmentModelName)
-            .findById(this.enrollmentId);
+            .findById(this.enrollment);
         if (!enrollment) {
             throw new ForeignKeyNotFound("Enrollment not found", "foreign-key-not-found");
         }
 
         const question = await mongoose
             .model(evaluationQuestionModelName)
-            .findById(this.questionId);
+            .findById(this.question);
         if (!question) {
             throw new ForeignKeyNotFound("Evaluation question not found", "foreign-key-not-found");
         }
@@ -46,13 +53,7 @@ evaluationAnswerSchema.pre("save", async function (next) {
 });
 
 
-export type EvaluationAnswerType = InferSchemaType<typeof evaluationAnswerSchema>;
-
 export const evaluationAnswerModelName = "EvaluationAnswer";
 
-const EvaluationAnswerModel = mongoose.model<EvaluationAnswerType>(
-    evaluationAnswerModelName,
-    evaluationAnswerSchema
-);
-
-export default EvaluationAnswerModel;
+export const EvaluationAnswerModel = mongoose.models[evaluationAnswerModelName] ||
+    mongoose.model<IEvaluationAnswer>(evaluationAnswerModelName, evaluationAnswerSchema);

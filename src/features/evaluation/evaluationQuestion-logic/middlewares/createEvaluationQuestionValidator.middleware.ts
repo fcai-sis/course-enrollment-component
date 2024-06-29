@@ -5,13 +5,20 @@ import { QuestionTypes } from "../../data/enums/questionTypes.enum";
 
 const createEvaluationQuestionValidatorMiddleware = [
   validator
-    .body("question")
+    .body("evaluationQuestion.question.en")
     .exists()
-    .withMessage("Question is required")
+    .withMessage("English question is required")
     .isString()
-    .withMessage("Question must be a string"),
+    .withMessage("English question must be a string"),
+
+    validator
+    .body("evaluationQuestion.question.ar")
+    .exists()
+    .withMessage("Arabic question is required")
+    .isString()
+    .withMessage("Arabic question must be a string"),
   validator
-    .body("type")
+    .body("evaluationQuestion.type")
     .exists()
     .withMessage("Type is required")
     .isString()
