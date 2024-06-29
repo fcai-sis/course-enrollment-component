@@ -115,6 +115,8 @@ const handler = async (req: Request, res: Response) => {
       return {
         department: dept.department,
         threshold: weightedAvgGpa,
+        currentCount: 0,
+        capacity: dept.department.capacity,
       };
     }
   );
@@ -134,8 +136,13 @@ const handler = async (req: Request, res: Response) => {
           sortedDept.department._id.toString() === preference._id.toString()
       );
 
-      if (dept && pref.gpa >= dept.threshold) {
+      if (
+        dept &&
+        pref.gpa >= dept.threshold &&
+        dept.currentCount < dept.capacity
+      ) {
         assignedDepartment = dept.department;
+        dept.currentCount++;
         break;
       }
     }
