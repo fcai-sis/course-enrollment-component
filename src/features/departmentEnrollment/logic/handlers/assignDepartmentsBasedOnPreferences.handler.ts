@@ -8,7 +8,6 @@ import {
 } from "@fcai-sis/shared-models";
 
 // Handler function to assign departments based on student preferences
-// TODO: this can probably be redone a lot better by making the academic student the FK instead of the student
 const handler = async (req: Request, res: Response) => {
   const allStudentPreferences = await studentPreferenceModel.find();
   if (allStudentPreferences.length === 0) {
@@ -54,7 +53,7 @@ const handler = async (req: Request, res: Response) => {
 
   const departments = await DepartmentModel.find({
     _id: { $in: preferenceIds },
-    program: ProgramEnum[1],
+    program: ProgramEnum[0],
   });
 
   if (departments.length === 0) {
