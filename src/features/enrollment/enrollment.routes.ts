@@ -17,11 +17,13 @@ import validateUpdateEnrollmentRequestBodyMiddleware from "./logic/middlewares/u
 import paginate from "express-paginate";
 import fetchEnrollmentByIdHandler from "./logic/handlers/fetchEnrollmentById.handler";
 import ensureEnrollmentIdInParamsMiddleware from "./logic/middlewares/ensureEnrollmentIdInParams.middleware";
+import checkEnrollConfigMiddleware from "./logic/middlewares/checkEnrollConfig.middleware";
 export default (router: Router) => {
   // Enroll in courses
   router.post(
     "/",
     checkRole([Role.STUDENT]),
+    checkEnrollConfigMiddleware,
     validateEnrollInCoursesRequestMiddleware,
     asyncHandler(enrollInCoursesHandler)
   );
