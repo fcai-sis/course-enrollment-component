@@ -7,6 +7,9 @@ import {
   StudentModel,
   UserModel,
   EnrollmentStatusEnum,
+  CourseTypeEnum,
+  AcademicStudentModel,
+  dynamicConfigModel,
 } from "@fcai-sis/shared-models";
 import { Request, Response } from "express";
 
@@ -38,7 +41,9 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
       },
     });
 
-  const student = await StudentModel.findOne({ user: studentUser._id });
+  const student = await StudentModel.findOne({
+    user: studentUser._id,
+  }).populate("bylaw");
   if (!student)
     return res.status(404).json({
       error: {
@@ -90,6 +95,69 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
         return availableCourse.course.code === courseToEnrollIn.courseCode;
       })
     );
+
+  const isGradProjectInCoursesToEnrollIn =
+    coursesToEnrollInThatAreAvailableThisSemester.some(
+      (course) => course.course.courseType === CourseTypeEnum[2]
+    );
+
+  if (isGradProjectInCoursesToEnrollIn) {
+    const config = await dynamicConfigModel.findOne();
+
+    if (!config) {
+      return res.status(500).json({
+        error: {
+          message: "No configuration found",
+        },
+      });
+    }
+
+    if (!config.isGradProjectRegisterOpen) {
+      return res.status(403).json({
+        error: {
+          message: "Not allowed to register graduation projects at this time",
+        },
+      });
+    }
+    // check if the student is eligible to enroll in a graduation project via the bylaw
+    const academicStudent = await AcademicStudentModel.findOne({
+      student: studentId,
+    }).populate("major");
+    if (!academicStudent) {
+      return res.status(400).json({
+        error: {
+          message: "Student not found",
+        },
+      });
+    }
+    const studentMajor = academicStudent.major.code;
+    const studentGradProjectBylaw = student.bylaw.graduationProjectRequirements;
+    console.log(studentMajor);
+    let projectRequirements: any = null;
+
+    // graduation project requirements is a map of major to graduation project requirements, each major has mandatory hours, elective hours and total hours
+
+    // loop over studentGradProjectRequirements and find the key that matches the student major code
+    // if the key is found, assign the value to studentGradProjectRequirements
+    // if the key is not found, return an error
+    studentGradProjectBylaw.forEach((gradProjectBylaw: any, key: any) => {
+      if (key === studentMajor) {
+        projectRequirements = gradProjectBylaw;
+      }
+    });
+    console.log(projectRequirements);
+    const studentCreditHours = academicStudent.creditHours;
+    if (
+      projectRequirements &&
+      studentCreditHours < projectRequirements.totalHours
+    ) {
+      return res.status(400).json({
+        error: {
+          message: "Student is not eligible to enroll in a graduation project",
+        },
+      });
+    }
+  }
 
   const studentsEnrollments = await EnrollmentModel.find({
     student: studentId,
