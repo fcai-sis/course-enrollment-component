@@ -145,8 +145,8 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
         projectRequirements = gradProjectBylaw;
       }
     });
-    console.log(projectRequirements);
-    const studentCreditHours = academicStudent.creditHours;
+    console.log(projectRequirements); 
+    const studentCreditHours = academicStudent.creditHours; // TODO: use mandatory and elective hours
     if (
       projectRequirements &&
       studentCreditHours < projectRequirements.totalHours

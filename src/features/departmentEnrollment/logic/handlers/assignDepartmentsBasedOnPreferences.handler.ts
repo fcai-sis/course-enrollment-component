@@ -114,7 +114,7 @@ const handler = async (req: Request, res: Response) => {
       return {
         department: dept.department,
         threshold: weightedAvgGpa,
-        currentCount: 0,
+        currentCount: 0, // TODO : count the academic students in this department who aren't graduated
         capacity: dept.department.capacity,
       };
     }
