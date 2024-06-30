@@ -15,6 +15,8 @@ import assignHallsHandler from "./logic/handlers/assignHalls.handler";
 import validateAssignHallRequestMiddleware from "./logic/middlewares/assignHallRequest.middleware";
 import validateUpdateEnrollmentRequestBodyMiddleware from "./logic/middlewares/updateEnrollmentRequestBody.middleware";
 import paginate from "express-paginate";
+import fetchEnrollmentByIdHandler from "./logic/handlers/fetchEnrollmentById.handler";
+import ensureEnrollmentIdInParamsMiddleware from "./logic/middlewares/ensureEnrollmentIdInParams.middleware";
 export default (router: Router) => {
   // Enroll in courses
   router.post(
@@ -73,5 +75,15 @@ export default (router: Router) => {
     checkRole([Role.EMPLOYEE, Role.ADMIN]),
     validateAssignHallRequestMiddleware,
     asyncHandler(assignHallsHandler)
+  );
+
+  router.get(
+    "/my-enrollments/:enrollment",
+
+    checkRole([Role.STUDENT]),
+
+    ensureEnrollmentIdInParamsMiddleware,
+
+    asyncHandler(fetchEnrollmentByIdHandler)
   );
 };
