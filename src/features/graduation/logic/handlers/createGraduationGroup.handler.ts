@@ -6,6 +6,7 @@ import {
   ISemester,
   ITaTeaching,
 } from "@fcai-sis/shared-models";
+import { ObjectId } from "mongoose";
 
 type HandlerRequest = Request<
   {},
@@ -14,7 +15,7 @@ type HandlerRequest = Request<
     enrollments: IEnrollment[];
     instructorTeachings: IInstructorTeaching[];
     assistantTeachings: ITaTeaching[];
-    semester: ISemester;
+    semester: ObjectId;
   }
 >;
 
@@ -46,7 +47,7 @@ const handler = async (req: HandlerRequest, res: Response) => {
     message: "Graduation project group created successfully",
     graduationProject,
   };
-  
+
   return res.status(201).json(response);
 };
 
