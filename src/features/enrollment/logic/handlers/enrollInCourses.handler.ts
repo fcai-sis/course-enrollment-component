@@ -132,30 +132,50 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
     }
     const studentMajor = academicStudent.major.code;
     const studentGradProjectBylaw = student.bylaw.graduationProjectRequirements;
-    console.log(studentMajor);
     let projectRequirements: any = null;
 
     // graduation project requirements is a map of major to graduation project requirements, each major has mandatory hours, elective hours and total hours
 
     // loop over studentGradProjectRequirements and find the key that matches the student major code
     // if the key is found, assign the value to studentGradProjectRequirements
-    // if the key is not found, return an error
     studentGradProjectBylaw.forEach((gradProjectBylaw: any, key: any) => {
       if (key === studentMajor) {
         projectRequirements = gradProjectBylaw;
       }
     });
-    console.log(projectRequirements); 
-    const studentCreditHours = academicStudent.creditHours; // TODO: use mandatory and elective hours
-    if (
-      projectRequirements &&
-      studentCreditHours < projectRequirements.totalHours
-    ) {
-      return res.status(400).json({
-        error: {
-          message: "Student is not eligible to enroll in a graduation project",
-        },
-      });
+    const studentCreditHours = {
+      mandatoryHours: academicStudent.mandatoryHours,
+      electiveHours: academicStudent.electiveHours,
+      totalHours:
+        academicStudent.mandatoryHours + academicStudent.electiveHours,
+    };
+    if (student.bylaw.useDetailedGraduationProjectHours) {
+      if (
+        studentCreditHours.mandatoryHours < projectRequirements.mandatoryHours
+      ) {
+        return res.status(400).json({
+          error: {
+            message: "Student does not meet the mandatory hours requirement",
+          },
+        });
+      }
+      if (
+        studentCreditHours.electiveHours < projectRequirements.electiveHours
+      ) {
+        return res.status(400).json({
+          error: {
+            message: "Student does not meet the elective hours requirement",
+          },
+        });
+      }
+    } else {
+      if (studentCreditHours.totalHours < projectRequirements.totalHours) {
+        return res.status(400).json({
+          error: {
+            message: "Student does not meet the total hours requirement",
+          },
+        });
+      }
     }
   }
 
