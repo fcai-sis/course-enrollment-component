@@ -11,6 +11,9 @@ import getAllGraduationGroupsHandler from "./logic/handlers/getAllGraduationGrou
 import deleteGraduationGroupHandler from "./logic/handlers/deleteGraduationGroup.handler";
 import getMyGraduationGroupHandler from "./logic/handlers/getMyGraduationGroup.handler";
 import paginate from "express-paginate";
+import getAllGraduationProjectEnrollmentsHandler from "./logic/handlers/getGraduationProjectEnrolls.handler";
+import getAllGraduationProjectTeachingsHandler from "./logic/handlers/getGraduationProjectTeachings.handler";
+import getLatestSemesterMiddleware from "./logic/middlewares/getLatestSemester.middleware";
 
 const graduationGroupRoutes = (router: Router) => {
   /**
@@ -19,7 +22,8 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.post(
     "/create",
-    checkRole([Role.EMPLOYEE, Role.INSTRUCTOR]),
+    // checkRole([Role.EMPLOYEE, Role.INSTRUCTOR]),
+    getLatestSemesterMiddleware,
     createGraduationGroupRequestBodyMiddleware,
     asyncHandler(CreateGraduationGroupHandler)
   );
@@ -44,6 +48,18 @@ const graduationGroupRoutes = (router: Router) => {
     "/mygroup",
     checkRole([Role.STUDENT]),
     asyncHandler(getMyGraduationGroupHandler)
+  );
+
+  router.get(
+    "/grad-enrolls",
+    // checkRole([Role.EMPLOYEE, Role.ADMIN]),
+    asyncHandler(getAllGraduationProjectEnrollmentsHandler)
+  );
+
+  router.get(
+    "/grad-teachings",
+    // checkRole([Role.EMPLOYEE, Role.ADMIN]),
+    asyncHandler(getAllGraduationProjectTeachingsHandler)
   );
 
   /**
