@@ -88,8 +88,8 @@ const handler = async (req: Request, res: Response) => {
     ...allStudentPreferences.map((pref) => pref.preferences.length)
   );
 
-  const departmentThresholds = departmentsPreferencesAndTheirStudents.map(
-    (dept) => {
+  const departmentThresholds = await Promise.all(
+    departmentsPreferencesAndTheirStudents.map(async (dept) => {
       let totalWeightedGpa = 0;
       let totalWeight = 0;
 
@@ -111,13 +111,18 @@ const handler = async (req: Request, res: Response) => {
 
       const weightedAvgGpa = totalWeightedGpa / totalWeight;
 
+      const departmentCurrentCount = await AcademicStudentModel.find({
+        major: dept.department,
+        isGraduated: false,
+      });
+
       return {
         department: dept.department,
         threshold: weightedAvgGpa,
-        currentCount: 0, // TODO : count the academic students in this department who aren't graduated
+        currentCount: departmentCurrentCount.length,
         capacity: dept.department.capacity,
       };
-    }
+    })
   );
 
   const sortedDepartments = departmentThresholds.sort(
