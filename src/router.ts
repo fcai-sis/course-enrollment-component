@@ -7,6 +7,7 @@ import bylawRoutes from "./features/bylaw/bylaw.routes";
 import evaluationQuestionRoutes from "./features/evaluation/evaluationQuestion.routes";
 import studentPreferenceRoutes from "./features/departmentEnrollment/studentPreference.routes";
 import evaluationAnswerRoutes from "./features/evaluation/evaluationAnswer-logic/evaluationAnswer.routes";
+import configRoutes from "./features/config/config.routes";
 
 export const enrollmentRouter = () => {
   const router = Router();
@@ -47,5 +48,11 @@ export const evaluationAnswerRouter = () => {
 export const studentPreferenceRouter = () => {
   const router = Router();
   studentPreferenceRoutes(router);
+  return router;
+};
+
+export const configRouter = () => {
+  const router = Router();
+  configRoutes(router);
   return router;
 };

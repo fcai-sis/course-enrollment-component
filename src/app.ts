@@ -6,6 +6,7 @@ import express, { NextFunction, Request, Response } from "express";
 
 import {
   bylawRouter,
+  configRouter,
   enrollmentRouter,
   evaluationAnswerRouter,
   evaluationQuestionRouter,
@@ -63,6 +64,7 @@ app.use("/bylaw", bylawRouter());
 app.use("/questions", evaluationQuestionRouter());
 app.use("/evaluation-answer", evaluationAnswerRouter());
 app.use("/student-preference", studentPreferenceRouter());
+app.use("/config", configRouter());
 
 // TODO: Custom 404 handler
 app.use((req: Request, res: Response, next: NextFunction) => {
