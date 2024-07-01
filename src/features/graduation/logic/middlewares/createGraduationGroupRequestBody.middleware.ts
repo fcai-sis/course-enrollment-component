@@ -14,15 +14,7 @@ const middlewares = [
     .exists()
     .withMessage("Semester is required")
     .isMongoId()
-    .withMessage("Semester must be a valid MongoDB ID")
-    .custom(async (value) => {
-      // Check if the semester exists in the database
-      const semester = await SemesterModel.findById(value);
-      if (!semester) {
-        throw new Error("Semester does not exist");
-      }
-      return true;
-    }),
+    .withMessage("Semester must be a valid MongoDB ID"),
 
   validator
     .body("enrollments")
@@ -51,7 +43,7 @@ const middlewares = [
       const semesterId = req.body.semester;
 
       for (const enrollment of enrollments) {
-        if (enrollment.semester._id.toString() !== semesterId) {
+        if (enrollment.semester._id.toString() !== semesterId.toString()) {
           throw new Error("All enrollments must belong to the same semester");
         }
       }
@@ -90,7 +82,9 @@ const middlewares = [
       const semesterId = req.body.semester;
 
       for (const instructorTeaching of enrollments) {
-        if (instructorTeaching.semester._id.toString() !== semesterId) {
+        if (
+          instructorTeaching.semester._id.toString() !== semesterId.toString()
+        ) {
           throw new Error(
             "All instructor teachings must belong to the same semester"
           );
@@ -118,7 +112,9 @@ const middlewares = [
       const semesterId = req.body.semester;
 
       for (const assistantTeaching of enrollments) {
-        if (assistantTeaching.semester._id.toString() !== semesterId) {
+        if (
+          assistantTeaching.semester._id.toString() !== semesterId.toString()
+        ) {
           throw new Error(
             "All assistant teachings must belong to the same semester"
           );
