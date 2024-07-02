@@ -40,7 +40,7 @@ const handler = async (req: HandlerRequest, res: Response) => {
   });
 
   await newBylaw.save();
-  return res.status(200).json({
+  return res.status(201).json({
     message: "Bylaw created successfully",
   });
 };
