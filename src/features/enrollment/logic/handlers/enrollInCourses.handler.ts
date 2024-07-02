@@ -36,9 +36,11 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
   const studentUser = await UserModel.findById(user.userId);
   if (!studentUser)
     return res.status(404).json({
-      error: {
-        message: "User not found",
-      },
+      errors: [
+        {
+          message: "User not found",
+        },
+      ],
     });
 
   const student = await StudentModel.findOne({
@@ -46,9 +48,11 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
   }).populate("bylaw");
   if (!student)
     return res.status(404).json({
-      error: {
-        message: "Student not found",
-      },
+      errors: [
+        {
+          message: "Student not found",
+        },
+      ],
     });
   const studentId = student._id;
 
@@ -59,9 +63,11 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
   );
   if (!latestSemester)
     return res.status(404).json({
-      error: {
-        message: "No semester found",
-      },
+      errors: [
+        {
+          message: "No semester found",
+        },
+      ],
     });
   const latestSemesterId = latestSemester._id;
 
@@ -82,10 +88,12 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
 
   if (coursesToEnrollInThatAreNotAvailableThisSemester.length > 0) {
     return res.status(400).json({
-      error: {
-        message: "Some courses are not available this semester",
-        courses: coursesToEnrollInThatAreNotAvailableThisSemester,
-      },
+      errors: [
+        {
+          message: "Some courses are not available this semester",
+          courses: coursesToEnrollInThatAreNotAvailableThisSemester,
+        },
+      ],
     });
   }
 
@@ -106,17 +114,21 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
 
     if (!config) {
       return res.status(500).json({
-        error: {
-          message: "No configuration found",
-        },
+        errors: [
+          {
+            message: "No configuration found",
+          },
+        ],
       });
     }
 
     if (!config.isGradProjectRegisterOpen) {
       return res.status(403).json({
-        error: {
-          message: "Not allowed to register graduation projects at this time",
-        },
+        errors: [
+          {
+            message: "Not allowed to register graduation projects at this time",
+          },
+        ],
       });
     }
     // check if the student is eligible to enroll in a graduation project via the bylaw
@@ -125,9 +137,11 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
     }).populate("major");
     if (!academicStudent) {
       return res.status(400).json({
-        error: {
-          message: "Student not found",
-        },
+        errors: [
+          {
+            message: "Student not found",
+          },
+        ],
       });
     }
     const studentMajor = academicStudent.major.code;
@@ -154,26 +168,32 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
         studentCreditHours.mandatoryHours < projectRequirements.mandatoryHours
       ) {
         return res.status(400).json({
-          error: {
-            message: "Student does not meet the mandatory hours requirement",
-          },
+          errors: [
+            {
+              message: "Student does not meet the mandatory hours requirement",
+            },
+          ],
         });
       }
       if (
         studentCreditHours.electiveHours < projectRequirements.electiveHours
       ) {
         return res.status(400).json({
-          error: {
-            message: "Student does not meet the elective hours requirement",
-          },
+          errors: [
+            {
+              message: "Student does not meet the elective hours requirement",
+            },
+          ],
         });
       }
     } else {
       if (studentCreditHours.totalHours < projectRequirements.totalHours) {
         return res.status(400).json({
-          error: {
-            message: "Student does not meet the total hours requirement",
-          },
+          errors: [
+            {
+              message: "Student does not meet the total hours requirement",
+            },
+          ],
         });
       }
     }

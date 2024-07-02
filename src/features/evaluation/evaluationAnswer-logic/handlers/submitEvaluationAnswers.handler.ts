@@ -29,28 +29,34 @@ export const submitEvaluationAnswersHandler = async (
   const student = await StudentModel.findOne({ user: user.userId });
   if (!student) {
     return res.status(404).json({
-      error: {
-        message: "Student not found",
-      },
+      errors: [
+        {
+          message: "Student not found",
+        },
+      ],
     });
   }
 
   const enrollment = await EnrollmentModel.findById(submittedEnrollment);
   if (!enrollment) {
     return res.status(404).json({
-      error: {
-        message: "Enrollment not found",
-      },
+      errors: [
+        {
+          message: "Enrollment not found",
+        },
+      ],
     });
   }
 
   // check if the enrollment belongs to the student
   if (enrollment.student.toString() !== student._id.toString()) {
     return res.status(403).json({
-      error: {
-        message:
-          "You are not allowed to submit evaluation answers for this enrollment",
-      },
+      errors: [
+        {
+          message:
+            "You are not allowed to submit evaluation answers for this enrollment",
+        },
+      ],
     });
   }
 

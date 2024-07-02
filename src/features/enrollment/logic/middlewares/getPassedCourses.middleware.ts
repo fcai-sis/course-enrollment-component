@@ -14,9 +14,11 @@ const getPassedCoursesMiddleware = async (
 
   if (!student)
     return res.status(404).json({
-      error: {
-        message: "Student not found",
-      },
+      errors: [
+        {
+          message: "Student not found",
+        },
+      ],
     });
 
   const studentsEnrollments = await EnrollmentModel.find({
@@ -25,9 +27,11 @@ const getPassedCoursesMiddleware = async (
 
   if (!studentsEnrollments)
     return res.status(500).json({
-      error: {
-        message: "An error occurred while fetching student enrollments",
-      },
+      errors: [
+        {
+          message: "An error occurred while fetching student enrollments",
+        },
+      ],
     });
 
   const passedCourses = studentsEnrollments

@@ -18,9 +18,11 @@ const handler = async (req: Request, res: Response) => {
 
   if (!latestSemester) {
     return res.status(404).json({
-      error: {
-        message: "There are no semesters at the moment",
-      },
+      errors: [
+        {
+          message: "There are no semesters at the moment",
+        },
+      ],
     });
   }
   const instructorTeachings = await InstructorTeachingModel.find({
@@ -37,17 +39,21 @@ const handler = async (req: Request, res: Response) => {
 
   if (!instructorTeachings) {
     return res.status(404).json({
-      error: {
-        message: "There are no instructor teachings at the moment",
-      },
+      errors: [
+        {
+          message: "There are no instructor teachings at the moment",
+        },
+      ],
     });
   }
 
   if (!taTeachings) {
     return res.status(404).json({
-      error: {
-        message: "There are no ta teachings at the moment",
-      },
+      errors: [
+        {
+          message: "There are no ta teachings at the moment",
+        },
+      ],
     });
   }
 
@@ -61,18 +67,22 @@ const handler = async (req: Request, res: Response) => {
 
   if (!filteredInstructorTeachings) {
     return res.status(404).json({
-      error: {
-        message:
-          "There are no graduation project instructor teachings at the moment",
-      },
+      errors: [
+        {
+          message:
+            "There are no graduation project instructor teachings at the moment",
+        },
+      ],
     });
   }
 
   if (!filteredTaTeachings) {
     return res.status(404).json({
-      error: {
-        message: "There are no graduation project ta teachings at the moment",
-      },
+      errors: [
+        {
+          message: "There are no graduation project ta teachings at the moment",
+        },
+      ],
     });
   }
 

@@ -9,13 +9,17 @@ type HandlerRequest = Request<{ evaluationAnswerId: string }, {}, {}>;
 const handler = async (req: HandlerRequest, res: Response) => {
   const evaluationAnswerId = req.params.evaluationAnswerId;
 
-  const evaluationAnswer = await EvaluationAnswerModel.findByIdAndDelete(evaluationAnswerId);
+  const evaluationAnswer = await EvaluationAnswerModel.findByIdAndDelete(
+    evaluationAnswerId
+  );
 
   if (!evaluationAnswer) {
     return res.status(404).json({
-      error: {
-        message: "Evaluation answer not found",
-      },
+      errors: [
+        {
+          message: "Evaluation answer not found",
+        },
+      ],
     });
   }
 

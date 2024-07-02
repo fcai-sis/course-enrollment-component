@@ -44,7 +44,11 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
   if (!graduationProject) {
     return res.status(404).json({
-      message: "Graduation project group not found",
+      errors: [
+        {
+          message: "Graduation project group not found",
+        },
+      ],
     });
   }
 

@@ -16,9 +16,11 @@ const middlewares = [
 
     if (!errors.isEmpty()) {
       return res.status(400).json({
-        error: {
-          message: errors.array()[0].msg,
-        },
+        errors: [
+          {
+            message: errors.array()[0].msg,
+          },
+        ],
       });
     }
 

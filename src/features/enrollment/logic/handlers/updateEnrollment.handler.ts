@@ -41,9 +41,11 @@ const updateEnrollmentHandler = async (req: HandlerRequest, res: Response) => {
 
   if (!updatedEnrollment) {
     return res.status(404).json({
-      error: {
-        message: "Enrollment not found",
-      },
+      errors: [
+        {
+          message: "Enrollment not found",
+        },
+      ],
     });
   }
 

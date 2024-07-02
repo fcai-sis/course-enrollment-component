@@ -36,9 +36,11 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
   if (!studentEnrollment) {
     return res.status(404).json({
-      error: {
-        message: "Student enrollment not found",
-      },
+      errors: [
+        {
+          message: "Student enrollment not found",
+        },
+      ],
     });
   }
 
@@ -48,9 +50,11 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
   if (!graduationEnrollment) {
     return res.status(404).json({
-      error: {
-        message: "Graduation enrollment not found",
-      },
+      errors: [
+        {
+          message: "Graduation enrollment not found",
+        },
+      ],
     });
   }
 
@@ -60,9 +64,11 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
   if (!graduationGroup) {
     return res.status(404).json({
-      error: {
-        message: "Graduation group not found",
-      },
+      errors: [
+        {
+          message: "Graduation group not found",
+        },
+      ],
     });
   }
 

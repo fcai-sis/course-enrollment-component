@@ -23,9 +23,11 @@ const handler = async (req: HandlerRequest, res: Response) => {
     );
     if (!latestSemester)
       return res.status(404).json({
-        error: {
-          message: "No semester found",
-        },
+        errors: [
+          {
+            message: "No semester found",
+          },
+        ],
       });
 
     semesterId = latestSemester._id;
@@ -40,9 +42,11 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
   if (enrollments.length === 0) {
     return res.status(404).json({
-      error: {
-        message: "No enrollments found for this course in this semester",
-      },
+      errors: [
+        {
+          message: "No enrollments found for this course in this semester",
+        },
+      ],
     });
   }
 

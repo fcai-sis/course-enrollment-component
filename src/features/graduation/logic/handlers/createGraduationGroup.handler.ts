@@ -37,9 +37,11 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
   if (!graduationProject) {
     return res.status(500).json({
-      error: {
-        message: "Failed to create graduation project group",
-      },
+      errors: [
+        {
+          message: "Failed to create graduation project group",
+        },
+      ],
     });
   }
 

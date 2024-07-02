@@ -29,18 +29,21 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
   if (!academicStudent) {
     return res.status(400).json({
-      error: {
-        message: "Student not found",
-      },
+      errors: [
+        {
+          message: "Student not found",
+        },
+      ],
     });
   }
-  // TODO: bylaw field maybe?
   if (academicStudent.level < 3) {
     return res.status(400).json({
-      error: {
-        message:
-          "You must be at least level 3 to submit department preferences",
-      },
+      errors: [
+        {
+          message:
+            "You must be at least level 3 to submit department preferences",
+        },
+      ],
     });
   }
 

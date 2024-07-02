@@ -18,7 +18,11 @@ const handler = async (req: Request, res: Response) => {
 
   if (!graduationGroups) {
     return res.status(404).json({
-      message: "There are no graduation groups at the moment",
+      errors: [
+        {
+          message: "There are no graduation groups at the moment",
+        },
+      ],
     });
   }
 

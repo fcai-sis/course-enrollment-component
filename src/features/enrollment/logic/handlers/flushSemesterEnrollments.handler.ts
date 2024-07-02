@@ -1,8 +1,5 @@
 import { Request, Response } from "express";
-import {
-  ISemester,
-  SemesterModel,
-} from "@fcai-sis/shared-models";
+import { ISemester, SemesterModel } from "@fcai-sis/shared-models";
 import { EnrollmentModel } from "@fcai-sis/shared-models";
 
 type HandlerRequest = Request<
@@ -26,9 +23,11 @@ const flushSemesterEnrollmentsHandler = async (
   const semester = await SemesterModel.findById(semesterId);
   if (!semester) {
     return res.status(404).json({
-      error: {
-        message: "Semester not found",
-      },
+      errors: [
+        {
+          message: "Semester not found",
+        },
+      ],
     });
   }
   await EnrollmentModel.deleteMany({ semesterId });

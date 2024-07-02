@@ -11,7 +11,7 @@ const getLatestSemesterMiddleware = async (
   });
 
   if (!latestSemester)
-    return res.status(404).json({ error: { message: "no semester found" } });
+    return res.status(404).json({ errors: [{ message: "no semester found" }] });
 
   req.body.semester = latestSemester._id;
 

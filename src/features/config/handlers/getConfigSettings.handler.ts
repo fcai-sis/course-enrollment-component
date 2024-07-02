@@ -6,9 +6,11 @@ const getConfigSettingsHandler = async (req: Request, res: Response) => {
 
   if (!config) {
     return res.status(500).json({
-      error: {
-        message: "No configuration found",
-      },
+      errors: [
+        {
+          message: "No configuration found",
+        },
+      ],
     });
   }
 

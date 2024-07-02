@@ -29,9 +29,11 @@ const fetchEligibleCourses = async (req: HandlerRequest, res: Response) => {
 
   if (!student)
     return res.status(404).json({
-      error: {
-        message: "Student not found",
-      },
+      errors: [
+        {
+          message: "Student not found",
+        },
+      ],
     });
 
   const { passedCourses } = req.body;
@@ -50,9 +52,11 @@ const fetchEligibleCourses = async (req: HandlerRequest, res: Response) => {
 
   if (!latestSemester)
     return res.status(404).json({
-      error: {
-        message: "No semester found",
-      },
+      errors: [
+        {
+          message: "No semester found",
+        },
+      ],
     });
 
   const coursesAvailableThisSemester = await SemesterCourseModel.find({

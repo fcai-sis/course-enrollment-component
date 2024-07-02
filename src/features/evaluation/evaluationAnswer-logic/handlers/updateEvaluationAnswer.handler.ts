@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { EvaluationAnswerModel } from "../../data/models/evaluationAnswer.model";
 
-
 type HandlerRequest = Request<
   {
     evaluationAnswerId: string;
@@ -31,9 +30,11 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
   if (!evaluationAnswer) {
     return res.status(404).json({
-      error: {
-        message: "Evaluation Answer not found",
-      },
+      errors: [
+        {
+          message: "Evaluation Answer not found",
+        },
+      ],
     });
   }
 
@@ -41,9 +42,7 @@ const handler = async (req: HandlerRequest, res: Response) => {
     message: "Evaluation Answer updated successfully",
     evaluationAnswer,
   });
-
 };
 
 const updateEvaluationAnswerHandler = handler;
 export default updateEvaluationAnswerHandler;
-

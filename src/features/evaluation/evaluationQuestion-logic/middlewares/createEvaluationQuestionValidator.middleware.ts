@@ -11,7 +11,7 @@ const createEvaluationQuestionValidatorMiddleware = [
     .isString()
     .withMessage("English question must be a string"),
 
-    validator
+  validator
     .body("evaluationQuestion.question.ar")
     .exists()
     .withMessage("Arabic question is required")
@@ -41,9 +41,11 @@ const createEvaluationQuestionValidatorMiddleware = [
       );
 
       return res.status(400).json({
-        error: {
-          message: errors.array()[0].msg,
-        },
+        errors: [
+          {
+            message: errors.array()[0].msg,
+          },
+        ],
       });
     }
     next();

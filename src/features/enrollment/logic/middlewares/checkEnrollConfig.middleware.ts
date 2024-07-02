@@ -10,17 +10,21 @@ const checkEnrollConfigMiddleware = async (
 
   if (!config) {
     return res.status(500).json({
-      error: {
-        message: "No configuration found",
-      },
+      errors: [
+        {
+          message: "No configuration found",
+        },
+      ],
     });
   }
 
   if (!config.isCourseEnrollOpen) {
     return res.status(403).json({
-      error: {
-        message: "Not allowed to enroll at this time",
-      },
+      errors: [
+        {
+          message: "Not allowed to enroll at this time",
+        },
+      ],
     });
   }
 

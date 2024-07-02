@@ -21,9 +21,11 @@ const assignHallsHandler = async (req: HandlerRequest, res: Response) => {
 
   if (!assignedHall) {
     return res.status(404).json({
-      error: {
-        message: "Hall not found",
-      },
+      errors: [
+        {
+          message: "Hall not found",
+        },
+      ],
     });
   }
 
@@ -33,9 +35,11 @@ const assignHallsHandler = async (req: HandlerRequest, res: Response) => {
   }).populate("student");
   if (enrollments.length === 0) {
     return res.status(404).json({
-      error: {
-        message: "No enrollments found for this course",
-      },
+      errors: [
+        {
+          message: "No enrollments found for this course",
+        },
+      ],
     });
   }
   // filter through each enrollment such that each student.studentId is between minValue and maxValue (inclusive)
@@ -47,9 +51,11 @@ const assignHallsHandler = async (req: HandlerRequest, res: Response) => {
 
   if (filteredEnrollments.length === 0) {
     return res.status(404).json({
-      error: {
-        message: "No enrollments found for this range of student IDs",
-      },
+      errors: [
+        {
+          message: "No enrollments found for this range of student IDs",
+        },
+      ],
     });
   }
 
@@ -82,9 +88,11 @@ const assignHallsHandler = async (req: HandlerRequest, res: Response) => {
 
   if (updatedEnrollments.length === 0) {
     return res.status(500).json({
-      error: {
-        message: "Failed to assign halls to students",
-      },
+      errors: [
+        {
+          message: "Failed to assign halls to students",
+        },
+      ],
     });
   }
 

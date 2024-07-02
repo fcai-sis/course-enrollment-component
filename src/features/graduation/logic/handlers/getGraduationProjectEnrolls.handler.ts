@@ -17,9 +17,11 @@ const handler = async (req: Request, res: Response) => {
 
   if (!latestSemester) {
     return res.status(404).json({
-      error: {
-        message: "There are no semesters at the moment",
-      },
+      errors: [
+        {
+          message: "There are no semesters at the moment",
+        },
+      ],
     });
   }
 
@@ -31,9 +33,11 @@ const handler = async (req: Request, res: Response) => {
 
   if (!enrollments) {
     return res.status(404).json({
-      error: {
-        message: "There are enrollments at the moment",
-      },
+      errors: [
+        {
+          message: "There are enrollments at the moment",
+        },
+      ],
     });
   }
 
@@ -43,9 +47,11 @@ const handler = async (req: Request, res: Response) => {
 
   if (!filteredEnrollments) {
     return res.status(404).json({
-      error: {
-        message: "There are no graduation project enrollments at the moment",
-      },
+      errors: [
+        {
+          message: "There are no graduation project enrollments at the moment",
+        },
+      ],
     });
   }
 

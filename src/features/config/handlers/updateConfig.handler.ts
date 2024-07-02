@@ -25,9 +25,11 @@ const updateConfigSettingsHandler = async (
 
   if (!updatedConfig) {
     return res.status(500).json({
-      error: {
-        message: "Failed to update configuration settings",
-      },
+      errors: [
+        {
+          message: "Failed to update configuration settings",
+        },
+      ],
     });
   }
 

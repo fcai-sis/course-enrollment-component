@@ -12,9 +12,11 @@ const handler = async (req: Request, res: Response) => {
   const allStudentPreferences = await studentPreferenceModel.find();
   if (allStudentPreferences.length === 0) {
     return res.status(400).json({
-      error: {
-        message: "No student preferences found",
-      },
+      errors: [
+        {
+          message: "No student preferences found",
+        },
+      ],
     });
   }
 
@@ -29,9 +31,11 @@ const handler = async (req: Request, res: Response) => {
 
   if (studentGpas.length === 0) {
     return res.status(400).json({
-      error: {
-        message: "No student GPAs found",
-      },
+      errors: [
+        {
+          message: "No student GPAs found",
+        },
+      ],
     });
   }
 
@@ -58,9 +62,11 @@ const handler = async (req: Request, res: Response) => {
 
   if (departments.length === 0) {
     return res.status(400).json({
-      error: {
-        message: "No departments found according to the preferences",
-      },
+      errors: [
+        {
+          message: "No departments found according to the preferences",
+        },
+      ],
     });
   }
 
@@ -78,9 +84,11 @@ const handler = async (req: Request, res: Response) => {
 
   if (departmentsPreferencesAndTheirStudents.length === 0) {
     return res.status(400).json({
-      error: {
-        message: "No students found according to the preferences",
-      },
+      errors: [
+        {
+          message: "No students found according to the preferences",
+        },
+      ],
     });
   }
 
