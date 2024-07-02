@@ -6,7 +6,7 @@ import validateCreateBylawRequestMiddleware from "./logic/middlewares/validateCr
 const bylawRoutes = (router: Router) => {
   // Create bylaw
   router.post(
-    "/create",
+    "/",
 
     validateCreateBylawRequestMiddleware,
 
