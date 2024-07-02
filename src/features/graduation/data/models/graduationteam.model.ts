@@ -33,21 +33,21 @@ const graduationProjectTeamSchema = new mongoose.Schema({
 graduationProjectTeamSchema.pre("save", async function (next) {
   try {
     const enrollments = await mongoose
-      .model(graduationProjectTeamModelName)
+      .model(enrollmentModelName)
       .find({ _id: { $in: this.enrollments } });
     if (enrollments.length !== this.enrollments.length) {
       throw new ForeignKeyNotFound("Some enrollments not found");
     }
 
     const instructors = await mongoose
-      .model(graduationProjectTeamModelName)
+      .model(instructorTeachingModelName)
       .find({ _id: { $in: this.instructorTeachings } });
     if (instructors.length !== this.instructorTeachings.length) {
       throw new ForeignKeyNotFound("Some instructors not found");
     }
 
     const assistants = await mongoose
-      .model(graduationProjectTeamModelName)
+      .model(taTeachingModelName)
       .find({ _id: { $in: this.assistantTeachings } });
     if (assistants.length !== this.assistantTeachings.length) {
       throw new ForeignKeyNotFound("Some assistants not found");
