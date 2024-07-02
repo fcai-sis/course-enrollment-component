@@ -67,6 +67,20 @@ const validateCreateBylawRequestMiddleware = [
     .withMessage("yearApplied is required")
     .isNumeric()
     .withMessage("yearApplied must be a number"),
+  
+  validator
+    .body("graduateRequirement")
+    .exists()
+    .withMessage("graduateRequirement is required")
+    .isNumeric()
+    .withMessage("graduateRequirement must be a number"),
+
+  validator
+    .body("coursePassCriteria")
+    .exists()
+    .withMessage("coursePassCriteria is required")
+    .isNumeric()
+    .withMessage("coursePassCriteria must be a number"),
 
   // Custom validations based on useDetailedHours
   (req: Request, res: Response, next: NextFunction) => {

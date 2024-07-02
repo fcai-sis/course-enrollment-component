@@ -12,7 +12,10 @@ type HandlerRequest = Request<
     useDetailedGraduationProjectHours: boolean;
     levelRequirements: { [key: string]: { mandatoryHours: number; electiveHours: number; totalHours: number; maxYears: number } };
     graduationProjectRequirements: { [key: string]: { mandatoryHours: number; electiveHours: number; totalHours: number } };
+    graduateRequirement: number;
+    coursePassCriteria: number;
     yearApplied: number;
+
   }
 >;
 
@@ -20,7 +23,7 @@ type HandlerRequest = Request<
  * create bylaw handler
  */
 const handler = async (req: HandlerRequest, res: Response) => {
-  const { name, gradeWeights, gpaScale, useDetailedHours, useDetailedGraduationProjectHours, levelRequirements, graduationProjectRequirements, yearApplied } = req.body;
+  const { name, gradeWeights, gpaScale, useDetailedHours, useDetailedGraduationProjectHours, levelRequirements, graduationProjectRequirements, yearApplied, graduateRequirement, coursePassCriteria  } = req.body;
 
   // Create a new bylaw
   const newBylaw = new BylawModel({
@@ -32,6 +35,8 @@ const handler = async (req: HandlerRequest, res: Response) => {
     levelRequirements,
     graduationProjectRequirements,
     yearApplied,
+    graduateRequirement,
+    coursePassCriteria
   });
 
   await newBylaw.save();
