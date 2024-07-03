@@ -5,11 +5,7 @@ import { Role, checkRole } from "@fcai-sis/shared-middlewares";
 import updateConfigSettingsHandler from "./handlers/updateConfig.handler";
 
 const configRoutes = (router: Router) => {
-  router.get(
-    "/",
-    checkRole([Role.ADMIN]),
-    asyncHandler(getConfigSettingsHandler)
-  );
+  router.get("/", asyncHandler(getConfigSettingsHandler));
   router.patch(
     "/",
 
