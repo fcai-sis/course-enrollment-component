@@ -21,23 +21,13 @@ const middlewares = [
     }),
 
   validator
-    .param("courseId")
+    .param("courseCode")
 
     .exists()
-    .withMessage("Course ID is required")
+    .withMessage("Course code is required")
 
-    .isMongoId()
-    .withMessage("Course ID must be a valid Mongo ID")
-    .custom(async (value) => {
-      // Check if the course exists
-      const course = await CourseModel.findById(value);
-
-      if (!course) {
-        throw new Error("Course not found");
-      }
-
-      return true;
-    }),
+    .isString()
+    .withMessage("Course code must be a valid string"),
 
   validateRequestMiddleware,
 ];

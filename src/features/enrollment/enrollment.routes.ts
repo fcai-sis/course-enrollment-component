@@ -67,7 +67,7 @@ export default (router: Router) => {
   );
 
   router.get(
-    "/:courseId",
+    "/:courseCode",
     checkRole([Role.EMPLOYEE, Role.ADMIN]),
     validateFetchSemesterEnrollmentsMiddleware,
     asyncHandler(fetchAllSemesterEnrollmentsHandler)

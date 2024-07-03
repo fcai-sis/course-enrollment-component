@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
-import { EnrollmentModel, SemesterModel } from "@fcai-sis/shared-models";
+import {
+  CourseModel,
+  EnrollmentModel,
+  SemesterModel,
+} from "@fcai-sis/shared-models";
 
 type HandlerRequest = Request<
-  { courseId: string },
+  { courseCode: string },
   {},
   { semesterId?: string }
 >;
@@ -11,7 +15,7 @@ type HandlerRequest = Request<
  * Fetches all enrollments in a semester for a specific course
  */
 const handler = async (req: HandlerRequest, res: Response) => {
-  const { courseId } = req.params;
+  const { courseCode } = req.params;
   let { semesterId } = req.body;
 
   // If semesterId is not provided, fetch the latest semesterId
@@ -33,9 +37,23 @@ const handler = async (req: HandlerRequest, res: Response) => {
     semesterId = latestSemester._id;
   }
 
+  const course = await CourseModel.findOne({
+    code: courseCode,
+  });
+
+  if (!course) {
+    return res.status(404).json({
+      errors: [
+        {
+          message: "Course not found",
+        },
+      ],
+    });
+  }
+
   const enrollments = await EnrollmentModel.find({
     semester: semesterId,
-    course: courseId,
+    course,
   })
     .populate("student")
     .sort({ "student.studentId": "asc" });
