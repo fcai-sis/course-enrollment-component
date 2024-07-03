@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { EnrollmentModel, HallModel } from "@fcai-sis/shared-models";
+import {
+  CourseModel,
+  EnrollmentModel,
+  HallModel,
+} from "@fcai-sis/shared-models";
 
 type HandlerRequest = Request<
   {},
@@ -29,9 +33,23 @@ const assignHallsHandler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
+  const courseRecord = await CourseModel.findOne({
+    code: course,
+  });
+
+  if (!course) {
+    return res.status(404).json({
+      errors: [
+        {
+          message: "Course not found",
+        },
+      ],
+    });
+  }
+
   // find all enrollments for this course
   const enrollments = await EnrollmentModel.find({
-    course,
+    course: courseRecord._id,
   }).populate("student");
   if (enrollments.length === 0) {
     return res.status(404).json({
@@ -63,7 +81,7 @@ const assignHallsHandler = async (req: HandlerRequest, res: Response) => {
 
   const updatedEnrollments = await Promise.all(
     filteredEnrollments.map(async (enrollment) => {
-      enrollment.exam.hall = assignedHall;
+      enrollment.examHall = assignedHall;
       // assign the exam.seatNumber to a random number between 1 and hall.capacity and isn't already assigned to another student in the same hall
       // TODO: hacky way to assign seat numbers, should be improved
       let seatNumber = Math.floor(Math.random() * assignedHall.capacity) + 1;
@@ -80,7 +98,7 @@ const assignHallsHandler = async (req: HandlerRequest, res: Response) => {
         }
       }
 
-      enrollment.exam.seatNumber = seatNumber;
+      enrollment.examSeatNumber = seatNumber;
 
       return enrollment.save();
     })

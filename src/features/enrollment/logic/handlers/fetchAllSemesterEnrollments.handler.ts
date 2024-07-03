@@ -16,6 +16,7 @@ type HandlerRequest = Request<
  */
 const handler = async (req: HandlerRequest, res: Response) => {
   const { courseCode } = req.params;
+  const { skip, limit } = req.query;
   let { semesterId } = req.body;
 
   // If semesterId is not provided, fetch the latest semesterId
@@ -56,7 +57,12 @@ const handler = async (req: HandlerRequest, res: Response) => {
     course,
   })
     .populate("student")
-    .sort({ "student.studentId": "asc" });
+    .sort({ "student.studentId": "asc" })
+    .skip(Number(skip ?? 0))
+    .limit(limit as unknown as number);
+
+  console.log("skip", skip);
+  console.log("limit", limit);
 
   if (enrollments.length === 0) {
     return res.status(404).json({
@@ -68,8 +74,14 @@ const handler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
+  const totalEnrollments = await EnrollmentModel.countDocuments({
+    semester: semesterId,
+    course,
+  });
+
   const response = {
     enrollments,
+    totalEnrollments,
   };
 
   return res.status(200).json(response);
