@@ -22,7 +22,7 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.post(
     "/create",
-    // checkRole([Role.EMPLOYEE, Role.INSTRUCTOR]),
+    checkRole([Role.EMPLOYEE, Role.INSTRUCTOR]),
     getLatestSemesterMiddleware,
     createGraduationGroupRequestBodyMiddleware,
     asyncHandler(CreateGraduationGroupHandler)
@@ -52,13 +52,13 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.get(
     "/grad-enrolls",
-    // checkRole([Role.EMPLOYEE, Role.ADMIN]),
+    checkRole([Role.EMPLOYEE, Role.INSTRUCTOR]),
     asyncHandler(getAllGraduationProjectEnrollmentsHandler)
   );
 
   router.get(
     "/grad-teachings",
-    // checkRole([Role.EMPLOYEE, Role.ADMIN]),
+    checkRole([Role.EMPLOYEE, Role.INSTRUCTOR]),
     asyncHandler(getAllGraduationProjectTeachingsHandler)
   );
 
