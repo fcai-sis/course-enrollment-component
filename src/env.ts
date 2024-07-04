@@ -4,6 +4,7 @@ export const env = {
   LOGS_PATH: process.env.LOGS_PATH,
   MONGO_URI: process.env.MONGO_URI,
   JWT_SECRET: process.env.JWT_SECRET,
+  MAIL_API_URL: process.env.MAIL_API_URL,
 };
 
 export const isDev = env.NODE_ENV === "development";
