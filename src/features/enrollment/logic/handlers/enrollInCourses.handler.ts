@@ -135,6 +135,15 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
     const academicStudent = await AcademicStudentModel.findOne({
       student: studentId,
     }).populate("major");
+    if (!academicStudent.major) {
+      return res.status(400).json({
+        errors: [
+          {
+            message: "Cannot enroll in graduation project without a major",
+          },
+        ],
+      });
+    }
     if (!academicStudent) {
       return res.status(400).json({
         errors: [
