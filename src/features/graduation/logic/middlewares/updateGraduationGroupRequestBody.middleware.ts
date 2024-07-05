@@ -94,8 +94,7 @@ const middlewares = [
 
   validator
     .body("assistantTeachings")
-    .exists()
-    .withMessage("Assistant teachings are required")
+    .optional()
     .isArray()
     .withMessage("Assistant teachings must be an array")
     .custom(async (value, { req }) => {
@@ -103,6 +102,7 @@ const middlewares = [
       const taTeachings = await TaTeachingModel.find({
         _id: { $in: value },
       }).populate("semester");
+
       if (taTeachings.length !== value.length) {
         throw new Error("Some assistant teachings do not exist");
       }

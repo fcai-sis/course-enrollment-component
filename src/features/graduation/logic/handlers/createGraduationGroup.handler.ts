@@ -12,9 +12,10 @@ type HandlerRequest = Request<
   {},
   {},
   {
+    projectTitle: string;
     enrollments: IEnrollment[];
     instructorTeachings: IInstructorTeaching[];
-    assistantTeachings: ITaTeaching[];
+    assistantTeachings?: ITaTeaching[];
     semester: ObjectId;
   }
 >;
@@ -23,10 +24,16 @@ type HandlerRequest = Request<
  * Creates a graduation project group.
  * */
 const handler = async (req: HandlerRequest, res: Response) => {
-  const { enrollments, instructorTeachings, assistantTeachings, semester } =
-    req.body;
+  const {
+    enrollments,
+    instructorTeachings,
+    assistantTeachings,
+    semester,
+    projectTitle,
+  } = req.body;
 
   const graduationProject = new GraduationProjectTeamModel({
+    projectTitle,
     enrollments,
     instructorTeachings,
     assistantTeachings,

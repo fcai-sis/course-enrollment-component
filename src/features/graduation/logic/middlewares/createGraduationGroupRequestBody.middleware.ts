@@ -96,8 +96,7 @@ const middlewares = [
 
   validator
     .body("assistantTeachings")
-    .exists()
-    .withMessage("Assistant teachings are required")
+    .optional()
     .isArray()
     .withMessage("Assistant teachings must be an array")
     .custom(async (value, { req }) => {

@@ -46,7 +46,8 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.get(
     "/mygroup",
-    checkRole([Role.STUDENT]),
+    checkRole([Role.STUDENT, Role.INSTRUCTOR, Role.TEACHING_ASSISTANT]),
+    getLatestSemesterMiddleware,
     asyncHandler(getMyGraduationGroupHandler)
   ); // TODO: make like this for instr and ta
 

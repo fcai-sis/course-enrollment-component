@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { GraduationProjectTeamModel } from "../../data/models/graduationteam.model";
-import mongoose from "mongoose";
 import {
   IEnrollment,
   IInstructorTeaching,
@@ -14,6 +13,7 @@ type HandlerRequest = Request<
   },
   {},
   {
+    projectTitle?: string;
     enrollments?: IEnrollment[];
     instructorTeachings?: IInstructorTeaching[];
     assistantTeachings?: ITaTeaching[];
@@ -27,11 +27,17 @@ type HandlerRequest = Request<
 
 const handler = async (req: HandlerRequest, res: Response) => {
   const { groupId } = req.params;
-  const { enrollments, instructorTeachings, assistantTeachings, semester } =
-    req.body;
+  const {
+    enrollments,
+    instructorTeachings,
+    assistantTeachings,
+    semester,
+    projectTitle,
+  } = req.body;
   const graduationProject = await GraduationProjectTeamModel.findByIdAndUpdate(
     groupId,
     {
+      ...(projectTitle && { projectTitle }),
       ...(enrollments && { enrollments }),
       ...(instructorTeachings && { instructorTeachings }),
       ...(assistantTeachings && { assistantTeachings }),
@@ -39,6 +45,7 @@ const handler = async (req: HandlerRequest, res: Response) => {
     },
     {
       new: true,
+      runValidators: true,
     }
   );
 
