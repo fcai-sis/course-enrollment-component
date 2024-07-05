@@ -102,16 +102,16 @@ const middlewares = [
     .withMessage("Assistant teachings must be an array")
     .custom(async (value, { req }) => {
       // Check if the assistant teachings exist in the database
-      const enrollments = await TaTeachingModel.find({
+      const teachings = await TaTeachingModel.find({
         _id: { $in: value },
       }).populate("semester");
-      if (enrollments.length !== value.length) {
+      if (teachings.length !== value.length) {
         throw new Error("Some assistant teachings do not exist");
       }
 
       const semesterId = req.body.semester;
 
-      for (const assistantTeaching of enrollments) {
+      for (const assistantTeaching of teachings) {
         if (
           assistantTeaching.semester._id.toString() !== semesterId.toString()
         ) {

@@ -48,7 +48,7 @@ const graduationGroupRoutes = (router: Router) => {
     "/mygroup",
     checkRole([Role.STUDENT]),
     asyncHandler(getMyGraduationGroupHandler)
-  );
+  ); // TODO: make like this for instr and ta
 
   router.get(
     "/grad-enrolls",

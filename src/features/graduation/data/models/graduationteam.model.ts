@@ -8,6 +8,8 @@ import { ForeignKeyNotFound } from "@fcai-sis/shared-utilities";
 import mongoose, { InferSchemaType } from "mongoose";
 
 const graduationProjectTeamSchema = new mongoose.Schema({
+  // TODO: project title
+
   enrollments: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: enrollmentModelName,
