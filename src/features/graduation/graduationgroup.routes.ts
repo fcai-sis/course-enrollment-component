@@ -86,7 +86,7 @@ const graduationGroupRoutes = (router: Router) => {
 
   router.delete(
     "/:groupId",
-    checkRole([Role.EMPLOYEE, Role.ADMIN]),
+    checkRole([Role.EMPLOYEE, Role.ADMIN, Role.INSTRUCTOR]),
     ensureGroupIdInParamsMiddleware,
     asyncHandler(deleteGraduationGroupHandler)
   );

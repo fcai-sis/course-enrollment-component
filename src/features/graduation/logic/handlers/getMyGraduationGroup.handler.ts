@@ -77,7 +77,11 @@ const handler = async (req: HandlerRequest, res: Response) => {
 
     const graduationGroup = await GraduationProjectTeamModel.findOne({
       enrollments: graduationEnrollment._id,
-    });
+    })
+      .populate("enrollments")
+      .populate("instructorTeachings")
+      .populate("assistantTeachings")
+      .populate("semester");
 
     if (!graduationGroup) {
       return res.status(404).json({
@@ -132,9 +136,32 @@ const handler = async (req: HandlerRequest, res: Response) => {
       });
     }
 
-    const graduationGroups = await GraduationProjectTeamModel.find({
-      instructorTeachings: { $in: filteredInstructorTeachings },
-    });
+    const graduationGroups = await GraduationProjectTeamModel.find(
+      {
+        instructorTeachings: { $in: filteredInstructorTeachings },
+      },
+      {
+        __v: 0,
+      }
+    )
+      .populate({
+        path: "enrollments",
+        populate: {
+          path: "student",
+        },
+      })
+      .populate({
+        path: "instructorTeachings",
+        populate: {
+          path: "instructor",
+        },
+      })
+      .populate({
+        path: "assistantTeachings",
+        populate: {
+          path: "ta",
+        },
+      });
 
     if (!graduationGroups) {
       return res.status(404).json({
@@ -193,9 +220,32 @@ const handler = async (req: HandlerRequest, res: Response) => {
       });
     }
 
-    const graduationGroups = await GraduationProjectTeamModel.find({
-      assistantTeachings: { $in: filteredTaTeachings },
-    });
+    const graduationGroups = await GraduationProjectTeamModel.find(
+      {
+        assistantTeachings: { $in: filteredTaTeachings },
+      },
+      {
+        __v: 0,
+      }
+    )
+      .populate({
+        path: "enrollments",
+        populate: {
+          path: "student",
+        },
+      })
+      .populate({
+        path: "instructorTeachings",
+        populate: {
+          path: "instructor",
+        },
+      })
+      .populate({
+        path: "assistantTeachings",
+        populate: {
+          path: "ta",
+        },
+      });
 
     if (!graduationGroups) {
       return res.status(404).json({
