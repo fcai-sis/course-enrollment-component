@@ -37,7 +37,7 @@ const assignHallsHandler = async (req: HandlerRequest, res: Response) => {
     code: course,
   });
 
-  if (!course) {
+  if (!courseRecord) {
     return res.status(404).json({
       errors: [
         {
@@ -72,6 +72,26 @@ const assignHallsHandler = async (req: HandlerRequest, res: Response) => {
       errors: [
         {
           message: "No enrollments found for this range of student IDs",
+        },
+      ],
+    });
+  }
+
+  // Get all enrollments that are already assigned to the hall for this course
+  const existingEnrollments = await EnrollmentModel.find({
+    examHall: assignedHall,
+    course: courseRecord,
+  });
+
+  // Get length of existing enrollments and check if it exceeds the hall capacity
+  if (
+    existingEnrollments.length + filteredEnrollments.length >
+    assignedHall.capacity
+  ) {
+    return res.status(400).json({
+      errors: [
+        {
+          message: "Hall capacity exceeded",
         },
       ],
     });
