@@ -6,8 +6,8 @@ export const generateExcelTemplate = async () => {
 
   // Add column headers
   worksheet.columns = [
-    { header: 'Student ID', key: 'studentId', width: 20 },
-    { header: 'Mark', key: 'mark', width: 20 },
+    { header: 'studentId', key: 'studentId', width: 20 },
+    { header: 'mark', key: 'mark', width: 20 },
   ];
 
   return workbook;
