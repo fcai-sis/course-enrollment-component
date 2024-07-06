@@ -56,6 +56,7 @@ const handler = async (req: HandlerRequest, res: Response) => {
     semester: semesterId,
     course,
   })
+    .populate("examHall")
     .populate("student")
     .sort({ "student.studentId": "asc" })
     .skip(Number(skip ?? 0))
