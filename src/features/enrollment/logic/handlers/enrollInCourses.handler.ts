@@ -33,6 +33,8 @@ type HandlerRequest = Request<
 const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
   const { user, coursesToEnrollIn } = req.body;
 
+  console.log(`Enrolling student ${user.userId} in courses`, coursesToEnrollIn);
+
   const studentUser = await UserModel.findById(user.userId);
   if (!studentUser)
     return res.status(404).json({
@@ -269,11 +271,16 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
   }
 
   for (const courseToEnrollIn of coursesToEnrollInThatAreAvailableThisSemester) {
+    console.log(
+      `Enrolling student ${studentId} in course ${courseToEnrollIn.course.code} and group ${courseToEnrollIn.group}`
+    );
     await EnrollmentModel.create({
       student: studentId,
       course: courseToEnrollIn.course._id,
       semester: latestSemesterId,
-      group: courseToEnrollIn.group,
+      group: coursesToEnrollIn.find(
+        (course) => course.courseCode === courseToEnrollIn.course.code
+      )?.group,
     });
   }
 

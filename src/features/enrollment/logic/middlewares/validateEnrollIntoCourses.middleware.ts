@@ -20,6 +20,12 @@ const validateEnrollInCoursesRequestMiddleware = [
     .isString()
     .withMessage("Course code must be a string"),
 
+  validator
+    .body("coursesToEnrollIn.*.group")
+    .optional()
+    .isString()
+    .withMessage("Group must be a string"),
+
   validateRequestMiddleware,
 ];
 

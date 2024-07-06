@@ -45,7 +45,7 @@ const fetchEnrollmentByIdHandler = async (
       ],
     });
 
-  res.status(200).json(enrollment);
+  res.status(200).json({ enrollment });
 };
 
 export default fetchEnrollmentByIdHandler;

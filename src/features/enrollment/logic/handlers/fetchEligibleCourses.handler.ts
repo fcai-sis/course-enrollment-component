@@ -127,10 +127,8 @@ const fetchEligibleCourses = async (req: HandlerRequest, res: Response) => {
       };
     })
   );
-  const response = {
-    courses: finalResponse,
-  };
 
+  const response = { courses: finalResponse };
   return res.status(200).json(response);
 };
 

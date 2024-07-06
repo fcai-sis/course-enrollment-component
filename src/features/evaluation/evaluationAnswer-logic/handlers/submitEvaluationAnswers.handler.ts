@@ -60,6 +60,9 @@ export const submitEvaluationAnswersHandler = async (
     });
   }
 
+  // delete all previous evaluation answers for this enrollment
+  await EvaluationAnswerModel.deleteMany({ enrollment: submittedEnrollment });
+
   const createdEvaluationAnswers = await EvaluationAnswerModel.insertMany(
     evaluationAnswers.map((evaluationAnswer) => ({
       ...evaluationAnswer,
