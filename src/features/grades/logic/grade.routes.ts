@@ -23,7 +23,7 @@ const gradeRoutes = (router: Router) => {
     asyncHandler(updateGradesHandler)
   );
 
-  router.post(
+  router.patch(
     "/batch-update",
     
     uploadFileMiddleware,

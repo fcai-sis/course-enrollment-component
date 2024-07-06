@@ -13,7 +13,7 @@ type HandlerRequest = Request<
   {
     grades: any[];
     course: string;
-    excelColumnsHeaders: string[]
+    excelColumnsHeaders: string[];
   }
 >;
 
@@ -21,7 +21,7 @@ type HandlerRequest = Request<
  * Updates the grades of an existing enrollment
  * */
 const batchUpdateGradesHandler = async (req: HandlerRequest, res: Response) => {
-  const { grades, course,  excelColumnsHeaders} = req.body;
+  const { grades, course, excelColumnsHeaders } = req.body;
 
   const duplicateIDs = findDuplicateIDs(grades);
   if (duplicateIDs.length > 0) {
@@ -62,7 +62,11 @@ const batchUpdateGradesHandler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
-    const markColumn = excelColumnsHeaders.includes(ExcelColumnsHeaders.finalExamMark) ? ExcelColumnsHeaders.finalExamMark : ExcelColumnsHeaders.termWorkMark;
+  const markColumn = excelColumnsHeaders.includes(
+    ExcelColumnsHeaders.finalExamMark
+  )
+    ? ExcelColumnsHeaders.finalExamMark
+    : ExcelColumnsHeaders.termWorkMark;
   for (const enrollment of enrollments) {
     const grade = grades.find(
       (grade: any) =>
@@ -74,7 +78,7 @@ const batchUpdateGradesHandler = async (req: HandlerRequest, res: Response) => {
     await EnrollmentModel.findByIdAndUpdate(
       enrollment._id,
       {
-        [markColumn]: grade.mark,
+        [markColumn]: grade.finalExamMark || grade.termWorkMark,
       },
       {
         runValidators: true,
