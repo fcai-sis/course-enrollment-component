@@ -2,12 +2,18 @@ import { EnrollmentModel, SemesterModel } from "@fcai-sis/shared-models";
 import { Request, Response } from "express";
 import { findDuplicateIDs } from "../../../utils/batch-upload.utils";
 
+enum ExcelColumnsHeaders {
+  finalExamMark = "finalExamMark",
+  termWorkMark = "termWorkMark",
+}
+
 type HandlerRequest = Request<
   {},
   {},
   {
     grades: any[];
     course: string;
+    excelColumnsHeaders: string[]
   }
 >;
 
@@ -15,9 +21,7 @@ type HandlerRequest = Request<
  * Updates the grades of an existing enrollment
  * */
 const batchUpdateGradesHandler = async (req: HandlerRequest, res: Response) => {
-  const grades = req.body.grades;
-  const course = req.body.course;
-  console.log("grades:", grades);
+  const { grades, course,  excelColumnsHeaders} = req.body;
 
   const duplicateIDs = findDuplicateIDs(grades);
   if (duplicateIDs.length > 0) {
@@ -58,6 +62,7 @@ const batchUpdateGradesHandler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
+    const markColumn = excelColumnsHeaders.includes(ExcelColumnsHeaders.finalExamMark) ? ExcelColumnsHeaders.finalExamMark : ExcelColumnsHeaders.termWorkMark;
   for (const enrollment of enrollments) {
     const grade = grades.find(
       (grade: any) =>
@@ -69,7 +74,7 @@ const batchUpdateGradesHandler = async (req: HandlerRequest, res: Response) => {
     await EnrollmentModel.findByIdAndUpdate(
       enrollment._id,
       {
-        termWorkMark: grade.mark,
+        [markColumn]: grade.mark,
       },
       {
         runValidators: true,
