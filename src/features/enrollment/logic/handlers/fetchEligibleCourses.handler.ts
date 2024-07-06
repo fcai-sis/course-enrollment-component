@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import {
   CoursePrerequisiteModel,
   CourseType,
+  SectionModel,
   SemesterCourseModel,
   SemesterModel,
   StudentModel,
@@ -109,11 +110,25 @@ const fetchEligibleCourses = async (req: HandlerRequest, res: Response) => {
           .includes(semesterCourse.course._id.toString())
     );
 
+  const eligibleCourses = [
+    ...coursesAvailableThisSemesterThatStudentHasNotEnrolledInOrPassedAndHaveMetPrerequisites,
+    ...coursesAvailableThisSemesterThatStudentHasNotEnrolledInOrPassedAndHaveNoPrerequisites,
+  ];
+
+  const finalResponse = await Promise.all(
+    eligibleCourses.map(async (course) => {
+      const sections = await SectionModel.find({
+        course: course.course._id,
+      });
+
+      return {
+        course: course.course,
+        sections,
+      };
+    })
+  );
   const response = {
-    courses: [
-      ...coursesAvailableThisSemesterThatStudentHasNotEnrolledInOrPassedAndHaveMetPrerequisites,
-      ...coursesAvailableThisSemesterThatStudentHasNotEnrolledInOrPassedAndHaveNoPrerequisites,
-    ],
+    courses: finalResponse,
   };
 
   return res.status(200).json(response);
