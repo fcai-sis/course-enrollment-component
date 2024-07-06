@@ -7,7 +7,8 @@ export const generateExcelTemplate = async () => {
   // Add column headers
   worksheet.columns = [
     { header: 'studentId', key: 'studentId', width: 20 },
-    { header: 'finalMark/termWorkMark', key: 'mark', width: 20 },
+    { header: 'termWorkMark', key: 'mark', width: 20 },
+    { header: 'finalExamMark', key: 'mark', width: 20}
   ];
 
   return workbook;

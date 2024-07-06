@@ -34,11 +34,8 @@ const batchUpdateGradesHandler = async (req: HandlerRequest, res: Response) => {
       ],
     });
   }
-  const latestSemester = await SemesterModel.findOne(
-    {},
-    {},
-    { sort: { startDate: -1 } }
-  );
+
+  const latestSemester = await SemesterModel.findOne({}, {}, { sort: { startDate: -1 } });
 
   const enrollments = await EnrollmentModel.find({
     semester: latestSemester._id,
@@ -62,28 +59,31 @@ const batchUpdateGradesHandler = async (req: HandlerRequest, res: Response) => {
     });
   }
 
-  const markColumn = excelColumnsHeaders.includes(
-    ExcelColumnsHeaders.finalExamMark
-  )
-    ? ExcelColumnsHeaders.finalExamMark
-    : ExcelColumnsHeaders.termWorkMark;
   for (const enrollment of enrollments) {
     const grade = grades.find(
-      (grade: any) =>
-        grade.studentId.toString() === enrollment.student.studentId
+      (grade: any) => grade.studentId.toString() === enrollment.student.studentId
     );
     if (!grade) {
       continue;
     }
-    await EnrollmentModel.findByIdAndUpdate(
-      enrollment._id,
-      {
-        [markColumn]: grade.finalExamMark || grade.termWorkMark,
-      },
-      {
-        runValidators: true,
-      }
-    );
+
+    const updateFields: any = {};
+    if (excelColumnsHeaders.includes(ExcelColumnsHeaders.finalExamMark) && grade.finalExamMark !== undefined) {
+      updateFields.finalExamMark = grade.finalExamMark;
+    }
+    if (excelColumnsHeaders.includes(ExcelColumnsHeaders.termWorkMark) && grade.termWorkMark !== undefined) {
+      updateFields.termWorkMark = grade.termWorkMark;
+    }
+
+    if (Object.keys(updateFields).length > 0) {
+      await EnrollmentModel.findByIdAndUpdate(
+        enrollment._id,
+        updateFields,
+        {
+          runValidators: true,
+        }
+      );
+    }
   }
 
   return res.status(200).json({
