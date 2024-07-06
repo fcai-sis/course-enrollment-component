@@ -12,7 +12,6 @@ type HandlerRequest = Request<
   },
   {
     limit?: number;
-    skip?: number;
   }
 >;
 
@@ -21,7 +20,6 @@ type HandlerRequest = Request<
  */
 const fetchEnrolledCourses = async (req: HandlerRequest, res: Response) => {
   const { userId } = req.body.user;
-  const { limit, skip } = req.query;
   const student = await StudentModel.findOne({ user: userId });
 
   if (!student) {
@@ -35,16 +33,9 @@ const fetchEnrolledCourses = async (req: HandlerRequest, res: Response) => {
   }
 
   // Find all enrollments with this student ID
-  const enrollments = await EnrollmentModel.find(
-    {
-      student: student._id,
-    },
-    {},
-    {
-      skip,
-      limit,
-    }
-  )
+  const enrollments = await EnrollmentModel.find({
+    student: student._id,
+  })
     .populate({
       path: "course",
       select: "code creditHours name -_id",
@@ -52,21 +43,22 @@ const fetchEnrolledCourses = async (req: HandlerRequest, res: Response) => {
     .populate({
       path: "examHall",
       select: "name -_id",
-    });
+    })
+    .skip(req.skip ?? 0)
+    .limit((req.query.limit as unknown as number) ?? 10);
 
-  const totalStudentEnrollments = await EnrollmentModel.countDocuments({
-    student: student._id,
-  });
+  const total = await EnrollmentModel.countDocuments({ student: student._id })
+    .skip(req.skip ?? 0)
+    .limit((req.query.limit as unknown as number) ?? 10);
 
   const passedEnrollments = enrollments.filter(
     (enrollment) => enrollment.status === "PASSED"
   );
 
   const response = {
-    // Return the enrolled courses
-    courses: enrollments,
-    totalStudentEnrollments,
-    passedCourses: passedEnrollments,
+    enrollments,
+    total,
+    passedEnrollments,
   };
 
   return res.status(200).json(response);
