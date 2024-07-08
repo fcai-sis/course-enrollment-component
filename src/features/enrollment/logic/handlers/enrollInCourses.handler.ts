@@ -10,6 +10,7 @@ import {
   CourseTypeEnum,
   AcademicStudentModel,
   dynamicConfigModel,
+  CourseDepartmentModel,
 } from "@fcai-sis/shared-models";
 import { Request, Response } from "express";
 
@@ -156,6 +157,35 @@ const enrollInCoursesHandler = async (req: HandlerRequest, res: Response) => {
       });
     }
     const studentMajor = academicStudent.major.code;
+    
+    const graduationCourses =
+      coursesToEnrollInThatAreAvailableThisSemester.filter(
+        (course) => course.course.courseType === CourseTypeEnum[2]
+      );
+
+    for (const graduationCourse of graduationCourses) {
+      const courseDepartment = await CourseDepartmentModel.findOne({
+        course: graduationCourse.course._id,
+      }).populate("department");
+      if (!courseDepartment) {
+        return res.status(400).json({
+          errors: [
+            {
+              message: "Course department not found",
+            },
+          ],
+        });
+      }
+      if (courseDepartment.department.code !== studentMajor) {
+        return res.status(400).json({
+          errors: [
+            {
+              message: "Student major does not match the course department",
+            },
+          ],
+        });
+      }
+    }
     const studentGradProjectBylaw = student.bylaw.graduationProjectRequirements;
     let projectRequirements: any = null;
 
